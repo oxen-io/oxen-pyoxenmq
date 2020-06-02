@@ -14,6 +14,17 @@ project(${PROJECT_NAME}
     DESCRIPTION "pybind layer for lokimq"
     LANGUAGES CXX)
 
+
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE RelWithDebInfo)
+endif()
+
+include(CheckCXXSourceCompiles)
+include(CheckLibraryExists)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+  
 option(SUBMODULE_CHECK "Enables checking that vendored library submodules are up to date" ON)
 if(SUBMODULE_CHECK)
   find_package(Git)
@@ -35,5 +46,9 @@ if(SUBMODULE_CHECK)
   endif()
 endif()
 
+add_compile_options(-Wno-deprecated-declarations)
+
 add_subdirectory(external/pybind11)
 add_subdirectory(external/loki-mq)
+
+add_subdirectory(pylokimq)
