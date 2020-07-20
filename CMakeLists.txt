@@ -41,7 +41,6 @@ if(SUBMODULE_CHECK)
     endfunction ()
     
     check_submodule(external/pybind11)
-    
     check_submodule(external/loki-mq)
   endif()
 endif()
