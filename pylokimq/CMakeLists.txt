@@ -1,6 +1,5 @@
 
 pybind11_add_module(pylokimq MODULE
-  batch_job.cpp
   lokimq.cpp
   module.cpp
 )
