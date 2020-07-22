@@ -11,5 +11,5 @@ namespace lokimq
   LokiMQ_Init(py::module &mod);
 
   void
-  BatchJob_Init(py::module & mod);
+  BEnocde_Init(py::module & mod);
 }
