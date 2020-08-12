@@ -3,6 +3,7 @@ import time
 
 def handle_auth(args):
     print(args)
+    raise Exception("boobs")
     return "OK"
 
 def main():

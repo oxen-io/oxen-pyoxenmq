@@ -2,7 +2,7 @@ import pylokimq
 
 def do_connected(lmq, conn):
     print("connected via", conn)
-    return lmq.request(conn, "llarp.auth", ["dq3j4dj99w6wi4t4yjnya8sxtqr1rojt8jgnn6467o6aoenm3o3o.loki", "token"])
+    return lmq.request(conn, "llarp.auth", ["dq3j4dj99w6wi4t4yjnya8sxtqr1rojt8jgnn6467o6aoenm3o3o.loki", "5:token"])
 
 def do_request(lmq):
     print('connect')

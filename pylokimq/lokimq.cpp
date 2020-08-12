@@ -51,7 +51,14 @@ namespace lokimq
                  std::string result;
                  {
                    py::gil_scoped_acquire gil;
-                   result = handler(msg.data);
+                   try
+                   {
+                     result = handler(msg.data);
+                   }
+                   catch(std::exception & ex)
+                   {
+                     PyErr_SetString(PyExc_RuntimeError, ex.what());
+                   }
                  }
                  msg.send_reply(result);
                });

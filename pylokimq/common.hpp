@@ -11,5 +11,5 @@ namespace lokimq
   LokiMQ_Init(py::module &mod);
 
   void
-  BEnocde_Init(py::module & mod);
+  BEncode_Init(py::module & mod);
 }
