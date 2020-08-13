@@ -6,6 +6,9 @@
 
 namespace lokimq
 {
+
+  static std::mutex log_mutex;
+
   void
   LokiMQ_Init(py::module & mod)
   {
@@ -13,9 +16,20 @@ namespace lokimq
     py::class_<address>(mod, "Address")
       .def(py::init<std::string>());
     py::class_<TaggedThreadID>(mod, "TaggedThreadID");
-    
+    py::enum_<LogLevel>(mod, "LogLevel")
+      .value("fatal", LogLevel::fatal).value("error", LogLevel::error).value("warn", LogLevel::warn)
+      .value("info", LogLevel::info).value("debug", LogLevel::debug).value("trace", LogLevel::trace);
+
     py::class_<LokiMQ>(mod, "LokiMQ")
       .def(py::init<>())
+      .def(py::init([](LogLevel level) {
+        // Quick and dirty logger that logs to stderr.  It would be much nicer to take a python
+        // function, but that deadlocks pretty much right away because of the crappiness of the gil.
+        return std::make_unique<LokiMQ>([] (LogLevel lvl, const char* file, int line, std::string msg) mutable {
+          std::lock_guard l{log_mutex};
+          std::cerr << '[' << lvl << "][" << file << ':' << line << "]: " << msg << "\n";
+        }, level);
+      }))
       .def("start", &LokiMQ::start)
       .def("listen_plain",
            [](LokiMQ & self, std::string path) {
