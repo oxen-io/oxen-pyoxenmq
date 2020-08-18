@@ -9,11 +9,13 @@
 
 namespace lokimq
 {
+  template <typename... Options>
   std::future<std::vector<py::bytes>> LokiMQ_start_request(
       LokiMQ& lmq,
       ConnectionID conn,
       std::string name,
-      std::vector<py::bytes> byte_args)
+      std::vector<py::bytes> byte_args,
+      Options&&... opts)
   {
     std::vector<std::string> args;
     args.reserve(byte_args.size());
@@ -42,7 +44,10 @@ namespace lokimq
             }
             result->set_exception(std::make_exception_ptr(std::runtime_error{"Request failed: " + err}));
           }
-        }, lokimq::send_option::data_parts(args.begin(), args.end()));
+        },
+        lokimq::send_option::data_parts(args.begin(), args.end()),
+        std::forward<Options>(opts)...
+    );
     return fut;
   }
 
@@ -160,20 +165,26 @@ namespace lokimq
            [](LokiMQ & self,
               ConnectionID conn,
               std::string name,
-              std::vector<py::bytes> args) -> std::vector<py::bytes>
+              std::vector<py::bytes> args,
+              std::optional<double> timeout) -> std::vector<py::bytes>
            {
-             return LokiMQ_start_request(self, conn, std::move(name), std::move(args)).get();
+             return LokiMQ_start_request(self, conn, std::move(name), std::move(args),
+                     lokimq::send_option::request_timeout{timeout ? std::chrono::milliseconds(long(*timeout * 1000)) : DEFAULT_REQUEST_TIMEOUT}
+                     ).get();
            },
-           "conn"_a, "name"_a, "args"_a = std::vector<py::bytes>{})
+           "conn"_a, "name"_a, "args"_a = std::vector<py::bytes>{}, "timeout"_a = py::none{})
       .def("request_future",
            [](LokiMQ & self,
               ConnectionID conn,
               std::string name,
-              std::vector<py::bytes> args) -> std::future<std::vector<py::bytes>>
+              std::vector<py::bytes> args,
+              std::optional<double> timeout) -> std::future<std::vector<py::bytes>>
            {
-             return LokiMQ_start_request(self, conn, std::move(name), std::move(args));
+             return LokiMQ_start_request(self, conn, std::move(name), std::move(args),
+                     lokimq::send_option::request_timeout{timeout ? std::chrono::milliseconds(long(*timeout * 1000)) : DEFAULT_REQUEST_TIMEOUT}
+                     );
            },
-           "conn"_a, "name"_a, "args"_a = std::vector<py::bytes>{})
+           "conn"_a, "name"_a, "args"_a = std::vector<py::bytes>{}, "timeout"_a = py::none{})
       ;
   }
 }
