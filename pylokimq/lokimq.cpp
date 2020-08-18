@@ -100,6 +100,16 @@ namespace lokimq
           std::cerr << '[' << lvl << "][" << file << ':' << line << "]: " << msg << "\n";
         }, level);
       }))
+      .def_readwrite("handshake_time", &LokiMQ::HANDSHAKE_TIME)
+      .def_readwrite("pubkey_base_routing_id", &LokiMQ::PUBKEY_BASED_ROUTING_ID)
+      .def_readwrite("max_message_size", &LokiMQ::MAX_MSG_SIZE)
+      .def_readwrite("max_sockets", &LokiMQ::MAX_SOCKETS)
+      .def_readwrite("reconnect_interval", &LokiMQ::RECONNECT_INTERVAL)
+      .def_readwrite("close_longer", &LokiMQ::CLOSE_LINGER)
+      .def_readwrite("connection_check_interval", &LokiMQ::CONN_CHECK_INTERVAL)
+      .def_readwrite("connection_heartbeat", &LokiMQ::CONN_HEARTBEAT)
+      .def_readwrite("connection_heartbeat_timeout", &LokiMQ::CONN_HEARTBEAT_TIMEOUT)
+      .def_readwrite("startup_umask", &LokiMQ::STARTUP_UMASK)
       .def("start", &LokiMQ::start)
       .def("listen_plain",
            [](LokiMQ & self, std::string path) {
