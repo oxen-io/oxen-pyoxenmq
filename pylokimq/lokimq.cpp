@@ -10,7 +10,7 @@
 namespace lokimq
 {
   template <typename... Options>
-  std::future<std::vector<py::bytes>> LokiMQ_start_request(
+  std::future<std::vector<std::string>> LokiMQ_start_request(
       LokiMQ& lmq,
       ConnectionID conn,
       std::string name,
@@ -22,19 +22,13 @@ namespace lokimq
     for (auto& b : byte_args)
       args.push_back(b);
 
-    auto result = std::make_shared<std::promise<std::vector<py::bytes>>>();
+    auto result = std::make_shared<std::promise<std::vector<std::string>>>();
     auto fut = result->get_future();
     lmq.request(conn, std::move(name),
         [result=std::move(result)](bool success, std::vector<std::string> value)
         {
           if (success)
-          {
-            std::vector<py::bytes> byte_values;
-            byte_values.reserve(value.size());
-            for (auto& v : value)
-              byte_values.emplace_back(std::move(v));
-            result->set_value(std::move(byte_values));
-          }
+            result->set_value(std::move(value));
           else
           {
             std::string err;
@@ -51,11 +45,13 @@ namespace lokimq
     return fut;
   }
 
-  template <typename F>
-  void bind_future(py::module& m, std::string class_name)
+  // Binds a stl future.  `Conv` is a lambda that converts the future's .get() value into something
+  // Python-y (it can be the value directly, if the value is convertible to Python already).
+  template <typename F, typename Conv>
+  void bind_future(py::module& m, std::string class_name, Conv conv)
   {
     py::class_<F>(m, class_name.c_str())
-      .def("get", &F::get,
+      .def("get", [conv=std::move(conv)](F& f) { return conv(f.get()); },
           "Gets the result (or raises an exception if the result set an exception); must only be called once")
       .def("valid", [](F& f) { return f.valid(); },
           "Returns true if the result is available")
@@ -88,7 +84,13 @@ namespace lokimq
       .value("deferred", std::future_status::deferred)
       .value("ready", std::future_status::ready)
       .value("timeout", std::future_status::timeout);
-    bind_future<std::future<std::vector<py::bytes>>>(mod, "ResultFuture");
+    bind_future<std::future<std::vector<std::string>>>(mod, "ResultFuture",
+            [](std::vector<std::string> bytes) {
+              py::list l;
+              for (const auto& v : bytes)
+                l.append(py::bytes(v));
+              return l;
+            });
 
     py::class_<LokiMQ>(mod, "LokiMQ")
       .def(py::init<>())
@@ -176,11 +178,14 @@ namespace lokimq
               ConnectionID conn,
               std::string name,
               std::vector<py::bytes> args,
-              std::optional<double> timeout) -> std::vector<py::bytes>
+              std::optional<double> timeout) -> py::list
            {
-             return LokiMQ_start_request(self, conn, std::move(name), std::move(args),
+             py::list l;
+             for (auto& s : LokiMQ_start_request(self, conn, std::move(name), std::move(args),
                      lokimq::send_option::request_timeout{timeout ? std::chrono::milliseconds(long(*timeout * 1000)) : DEFAULT_REQUEST_TIMEOUT}
-                     ).get();
+                     ).get())
+               l.append(py::bytes(s));
+             return l;
            },
            "conn"_a, "name"_a, "args"_a = std::vector<py::bytes>{}, "timeout"_a = py::none{})
       .def("request_future",
@@ -188,7 +193,7 @@ namespace lokimq
               ConnectionID conn,
               std::string name,
               std::vector<py::bytes> args,
-              std::optional<double> timeout) -> std::future<std::vector<py::bytes>>
+              std::optional<double> timeout) -> std::future<std::vector<std::string>>
            {
              return LokiMQ_start_request(self, conn, std::move(name), std::move(args),
                      lokimq::send_option::request_timeout{timeout ? std::chrono::milliseconds(long(*timeout * 1000)) : DEFAULT_REQUEST_TIMEOUT}
