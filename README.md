@@ -4,13 +4,13 @@ pybind layer for lokimq
 
 ## building
 
-check the source out:
+check the source out (recursive repo):
 
-   $ git clone --recursive https://github.com/loki-project/pylokimq
-   $ cd pylokimq
+    $ git clone --recursive https://github.com/majestrate/pylokimq
+    $ cd pylokimq
 
 and build with cmake:
    
-   $ mkdir build
-   $ cd build && cmake ..
-   $ make
+    $ mkdir build
+    $ cd build && cmake ..
+    $ make
