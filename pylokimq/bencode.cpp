@@ -1,17 +1,16 @@
 #include "common.hpp"
-#include "lokimq/bt_serialize.h"
+#include "lokimq/base32z.h"
 
 namespace lokimq
 {
   void
   BEncode_Init(py::module & mod)
   {
-   auto submod = mod.def_submodule("bencode");
-    submod.def("decode", [](py::bytes data) {
-                           char * ptr;
-                           Py_ssize_t len;
-                           PyBytes_AsStringAndSize(data.ptr(), &ptr, &len);
-                           return bt_get(std::string_view(ptr, len));
-    });
+    mod.def("base32z_encode", [](py::bytes data) {
+                                char * ptr = nullptr;
+                                py::ssize_t sz = 0;
+                                PyBytes_AsStringAndSize(data.ptr(), &ptr, &sz);
+                                return lokimq::to_base32z(ptr, ptr+sz);
+                              });
   }
 }
