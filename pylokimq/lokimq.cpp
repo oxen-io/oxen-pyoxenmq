@@ -159,6 +159,29 @@ namespace lokimq
                  msg.send_reply(result);
                });
            })
+      .def("add_request_command_ex",
+           [](LokiMQ &self,
+              const std::string & category,
+              const std::string & name,
+              std::function<std::string(std::vector<std::string_view, std::string_view, ConnectionID>)> handler)
+           {
+             self.add_request_command(category, name,
+               [handler](Message & msg) {
+                 std::string result;
+                 {
+                   py::gil_scoped_acquire gil;
+                   try
+                   {
+                     result = handler(msg.data, msg.remote, msg.conn);
+                   }
+                   catch(std::exception & ex)
+                   {
+                     PyErr_SetString(PyExc_RuntimeError, ex.what());
+                   }
+                 }
+                 msg.send_reply(result);
+               });
+           })
       .def("connect_remote",
            [](LokiMQ & self,
               std::string remote) -> ConnectionID
