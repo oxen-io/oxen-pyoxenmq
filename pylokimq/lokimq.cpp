@@ -163,7 +163,7 @@ namespace lokimq
            [](LokiMQ &self,
               const std::string & category,
               const std::string & name,
-              std::function<std::string(std::vector<std::string_view, std::string_view, ConnectionID>)> handler)
+              std::function<std::string(std::vector<std::string_view>, std::string_view, ConnectionID)> handler)
            {
              self.add_request_command(category, name,
                [handler](Message & msg) {
