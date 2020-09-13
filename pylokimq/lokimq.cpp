@@ -72,7 +72,10 @@ namespace lokimq
   LokiMQ_Init(py::module & mod)
   {
     using namespace pybind11::literals;
-    py::class_<ConnectionID>(mod, "ConnectionID");
+    py::class_<ConnectionID>(mod, "ConnectionID")
+      .def("__eq__", [](const ConnectionID & self, const ConnectionID & other) {
+        return self == other;
+      });
     py::class_<address>(mod, "Address")
       .def(py::init<std::string>());
     py::class_<TaggedThreadID>(mod, "TaggedThreadID");
