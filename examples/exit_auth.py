@@ -6,9 +6,10 @@ import argparse
 import io
 import time
 
-def decode_str(data):
-    s = ''
-    l = ''
+def decode_str(data, first=None):
+    l =''
+    if first is not None:
+        l += chr(first)
     while True:
         ch = data.read(1)
         if ch == b':':
@@ -16,50 +17,47 @@ def decode_str(data):
         else:
             l += chr(ch)
 
-def decode_list(data):
+def decode_list(data, first=None):
     l = []
-    ch = data.read(1)
-    assert ch == b'l'
+    assert first == b'l'
     while True:
-        ch = data.peek(1)
+        ch = data.read(1)
         if ch == b'e':
-            data.read(1)
             return l
-        l += decode_value(data)
+        l += decode_value(data, first=ch)
 
-def decode_dict(data):
+def decode_dict(data, first=None):
+    assert first == b'd'
     d = dict()
-    ch = data.read(1)
-    assert ch == b'd'
     while True:
-        ch = data.peek(1)
+        ch = data.read(1)
         if ch == b'e':
-            data.read(1)
             return d
-        k = decode_str(data)
-        v = decode_value(data)
+        k = decode_str(data, first=ch)
+        v = decode_value(data, first=ch)
         d[k] = v
 
-def decode_int(data):
-    ch = data.read(1)
+def decode_int(data, first=None):
     i = ''
-    assert ch == b'i'
     while True:
         ch = data.read(1)
         if ch == b'e':
             return int(i)
         i += chr(ch)
 
-def decode_value(data):
-    ch = data.peek(1)
+def decode_value(data, first=None):
+    if first:
+        ch = first
+    else:
+        ch = data.read(1)
     if ch in b'0123456789':
-        return decode_string(data)
+        return decode_string(data, first=ch)
     if ch == b'i':
-        return decode_int(data)
+        return decode_int(data, first=ch)
     if ch == b'd':
-        return decode_dict(data)
+        return decode_dict(data, first=ch)
     if ch == b'l':
-        return decode_list(data)
+        return decode_list(data, first=ch)
     raise Exception("invalid char: {}".format(ch))
 
 
@@ -67,11 +65,12 @@ def decode_address(data):
     return '{}.loki'.format(pylokimq.base32z_encode(decode_dict(data)[b's'][b's']))
 
 def handle_auth(args, cmd):
-    cmd += decode_address(io.BytesIO(args[0]))
-    cmd += base64.b64encode(args[1]).decode('ascii')
-    result = subprocess.run(args=cmd, check=False)
+    cmd2 = cmd
+    cmd2 += decode_address(io.BytesIO(args[0]))
+    cmd2 += base64.b64encode(args[1]).decode('ascii')
+    result = subprocess.run(args=cmd2, check=False)
     if result.returncode == 0:
-        return "OK"
+        return "OKAY"
     else:
         return "REJECT"
 
