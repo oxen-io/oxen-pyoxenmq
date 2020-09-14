@@ -75,7 +75,7 @@ def handle_auth_impl(args, cmd):
     
 def handle_auth(args, cmd):
     try:
-        return handle_args_impl(args, cmd)
+        return handle_auth_impl(args, cmd)
     except:
         traceback.print_exc()
     
