@@ -143,16 +143,23 @@ namespace lokimq
            [](LokiMQ &self,
               const std::string & category,
               const std::string & name,
-              std::function<std::string(std::vector<std::string_view>)> handler)
+              std::function<std::string(std::vector<py::bytes>)> handler)
            {
              self.add_request_command(category, name,
                [handler](Message & msg) {
                  std::string result;
+
+                 std::vector<py::bytes> data;
+                 for(auto & arg : msg.data)
+                 {
+                   data.emplace_back(arg.begin(), arg.size());
+                 }
+
                  {
                    py::gil_scoped_acquire gil;
                    try
                    {
-                     result = handler(msg.data);
+                     result = handler(data);
                    }
                    catch(std::exception & ex)
                    {
@@ -166,16 +173,23 @@ namespace lokimq
            [](LokiMQ &self,
               const std::string & category,
               const std::string & name,
-              std::function<std::string(std::vector<std::string_view>, std::string_view, ConnectionID)> handler)
+              std::function<std::string(std::vector<py::bytes>, std::string_view, ConnectionID)> handler)
            {
              self.add_request_command(category, name,
                [handler](Message & msg) {
                  std::string result;
+
+                 std::vector<py::bytes> data;
+                 for(auto & arg : msg.data)
+                 {
+                   data.emplace_back(arg.begin(), arg.size());
+                 }
+
                  {
                    py::gil_scoped_acquire gil;
                    try
                    {
-                     result = handler(msg.data, msg.remote, msg.conn);
+                     result = handler(data, msg.remote, msg.conn);
                    }
                    catch(std::exception & ex)
                    {
