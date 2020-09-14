@@ -5,6 +5,7 @@ import shlex
 import argparse
 import io
 import time
+import traceback
 
 def decode_str(data, first=None):
     l = b''
@@ -62,7 +63,7 @@ def decode_value(data, first=None):
 def decode_address(data):
     return '{}.loki'.format(pylokimq.base32z_encode(decode_dict(data)[b's'][b's']))
 
-def handle_auth(args, cmd):
+def handle_auth_impl(args, cmd):
     cmd2 = cmd
     cmd2.append(decode_address(io.BytesIO(args[0])))
     cmd2.append(base64.b64encode(args[1]).decode('ascii'))
@@ -71,7 +72,13 @@ def handle_auth(args, cmd):
         return "OKAY"
     else:
         return "REJECT"
-
+    
+def handle_auth(args, cmd):
+    try:
+        return handle_args_impl(args, cmd)
+    except:
+        traceback.print_exc()
+    
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--bind", required=True, help="url to bind auth socket to")
