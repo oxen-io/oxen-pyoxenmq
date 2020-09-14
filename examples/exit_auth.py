@@ -61,7 +61,7 @@ def decode_value(data, first=None):
 
 
 def decode_address(data):
-    return '{}.loki'.format(pylokimq.base32z_encode(decode_dict(data)[b's'][b's']))
+    return '{}.loki'.format(pylokimq.base32z_encode(decode_value(data)[b's'][b's']))
 
 def handle_auth_impl(args, cmd):
     cmd2 = cmd
