@@ -7,19 +7,18 @@ import io
 import time
 
 def decode_str(data, first=None):
-    l =''
+    l = b''
     if first is not None:
-        l += chr(first)
+        l += first
     while True:
         ch = data.read(1)
         if ch == b':':
             return data.read(int(l))
         else:
-            l += chr(ch)
+            l += ch
 
 def decode_list(data, first=None):
     l = []
-    assert first == b'l'
     while True:
         ch = data.read(1)
         if ch == b'e':
@@ -27,23 +26,22 @@ def decode_list(data, first=None):
         l += decode_value(data, first=ch)
 
 def decode_dict(data, first=None):
-    assert first == b'd'
     d = dict()
     while True:
         ch = data.read(1)
         if ch == b'e':
             return d
         k = decode_str(data, first=ch)
-        v = decode_value(data, first=ch)
+        v = decode_value(data)
         d[k] = v
 
 def decode_int(data, first=None):
-    i = ''
+    i = b''
     while True:
         ch = data.read(1)
         if ch == b'e':
-            return int(i)
-        i += chr(ch)
+            return int(i.decode('ascii'))
+        i += ch
 
 def decode_value(data, first=None):
     if first:
@@ -51,7 +49,7 @@ def decode_value(data, first=None):
     else:
         ch = data.read(1)
     if ch in b'0123456789':
-        return decode_string(data, first=ch)
+        return decode_str(data, first=ch)
     if ch == b'i':
         return decode_int(data, first=ch)
     if ch == b'd':
