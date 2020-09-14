@@ -13,7 +13,7 @@ def decode_str(data, first=None):
     while True:
         ch = data.read(1)
         if ch == b':':
-            return data.read(int(l))
+            return data.read(int(l.decode('ascii')))
         else:
             l += ch
 
