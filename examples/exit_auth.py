@@ -64,8 +64,8 @@ def decode_address(data):
 
 def handle_auth(args, cmd):
     cmd2 = cmd
-    cmd2 += decode_address(io.BytesIO(args[0]))
-    cmd2 += base64.b64encode(args[1]).decode('ascii')
+    cmd2.append(decode_address(io.BytesIO(args[0])))
+    cmd2.append(base64.b64encode(args[1]).decode('ascii'))
     result = subprocess.run(args=cmd2, check=False)
     if result.returncode == 0:
         return "OKAY"
