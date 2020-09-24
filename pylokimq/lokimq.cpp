@@ -76,6 +76,10 @@ namespace lokimq
       .def("__eq__", [](const ConnectionID & self, const ConnectionID & other) {
         return self == other;
       });
+    py::class_<Message>(mod, "Message")
+      .def_readonly("remote", &Message::remote)
+      .def_readonly("conn", &Message::conn);
+
     py::class_<address>(mod, "Address")
       .def(py::init<std::string>());
     py::class_<TaggedThreadID>(mod, "TaggedThreadID");
