@@ -127,7 +127,7 @@ namespace lokimq
            })
       .def("listen_curve", &LokiMQ::listen_curve)
       .def("add_tagged_thread",
-           [](LokiMQ & self, const std::string & name) {
+           [](LokiMQ & self, std::string name) {
              return self.add_tagged_thread(name);
            })
       .def("add_timer",
