@@ -148,15 +148,15 @@ namespace lokimq
              self.add_request_command(category, name,
                [handler](Message & msg) {
                  std::string result;
-
-                 std::vector<py::bytes> data;
-                 for(auto & arg : msg.data)
-                 {
-                   data.emplace_back(arg.begin(), arg.size());
-                 }
-
                  {
                    py::gil_scoped_acquire gil;
+
+                   std::vector<py::bytes> data;
+                   for (auto& arg : msg.data)
+                   {
+                     data.emplace_back(arg.begin(), arg.size());
+                   }
+
                    try
                    {
                      result = handler(data);
@@ -178,15 +178,15 @@ namespace lokimq
              self.add_request_command(category, name,
                [handler](Message & msg) {
                  std::string result;
-
-                 std::vector<py::bytes> data;
-                 for(auto & arg : msg.data)
-                 {
-                   data.emplace_back(arg.begin(), arg.size());
-                 }
-
                  {
                    py::gil_scoped_acquire gil;
+
+                   std::vector<py::bytes> data;
+                   for (auto& arg : msg.data)
+                   {
+                     data.emplace_back(arg.begin(), arg.size());
+                   }
+
                    try
                    {
                      result = handler(data, msg.remote, msg.conn);
