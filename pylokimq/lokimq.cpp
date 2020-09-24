@@ -4,6 +4,7 @@
 #include <lokimq/lokimq.h>
 #include <lokimq/address.h>
 #include <pybind11/chrono.h>
+#include <pybind11/functional.h>
 #include <future>
 #include <memory>
 
@@ -145,9 +146,9 @@ namespace lokimq
            })
       .def("add_request_command",
            [](LokiMQ &self,
-              const std::string & category,
-              const std::string & name,
-              std::function<std::string(std::vector<py::bytes>)> handler)
+              std::string category,
+              std::string name,
+              py::function handler)
            {
              self.add_request_command(category, name,
                [handler](Message & msg) {
@@ -163,7 +164,8 @@ namespace lokimq
 
                    try
                    {
-                     result = handler(data);
+                     const auto obj = handler(data);
+                     result = py::str(obj);
                    }
                    catch(std::exception & ex)
                    {
@@ -175,9 +177,9 @@ namespace lokimq
            })
       .def("add_request_command_ex",
            [](LokiMQ &self,
-              const std::string & category,
-              const std::string & name,
-              std::function<std::string(std::vector<py::bytes>, std::string_view, ConnectionID)> handler)
+              std::string category,
+              std::string name,
+              py::function handler)
            {
              self.add_request_command(category, name,
                [handler](Message & msg) {
@@ -193,7 +195,8 @@ namespace lokimq
 
                    try
                    {
-                     result = handler(data, msg.remote, msg.conn);
+                     const auto obj = handler(data, msg);
+                     result = py::str(obj);
                    }
                    catch(std::exception & ex)
                    {
