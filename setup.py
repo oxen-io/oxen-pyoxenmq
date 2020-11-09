@@ -68,7 +68,7 @@ setup(
     description='pybind lokimq bindings',
     long_description='',
     ext_modules=[CMakeExtension('pylokimq')],
-    packages=["lokinet"],
+    packages=["lokinet.auth"],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
 )
