@@ -48,6 +48,8 @@ endif()
 add_compile_options(-Wno-deprecated-declarations)
 
 add_subdirectory(external/pybind11)
-add_subdirectory(external/loki-mq)
+
+include(FindPkgConfig)
+pkg_check_modules(lokimq REQUIRED IMPORTED_TARGET GLOBAL liblokimq)
 
 add_subdirectory(pylokimq)
