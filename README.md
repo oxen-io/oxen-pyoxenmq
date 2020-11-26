@@ -4,6 +4,14 @@ pybind layer for lokimq
 
 ## building
 
+dependencies
+
+- python3-dev
+- cmake 
+- pkg-config 
+- liblokimq-dev
+
+
 check the source out (recursive repo):
 
     $ git clone --recursive https://github.com/loki-project/loki-pylokimq
