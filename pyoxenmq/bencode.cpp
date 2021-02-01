@@ -1,7 +1,7 @@
 #include "common.hpp"
-#include "lokimq/base32z.h"
+#include "oxenmq/base32z.h"
 
-namespace lokimq
+namespace oxenmq
 {
   void
   BEncode_Init(py::module & mod)
@@ -10,7 +10,7 @@ namespace lokimq
                                 char * ptr = nullptr;
                                 py::ssize_t sz = 0;
                                 PyBytes_AsStringAndSize(data.ptr(), &ptr, &sz);
-                                return lokimq::to_base32z(ptr, ptr+sz);
+                                return oxenmq::to_base32z(ptr, ptr+sz);
                               });
   }
 }

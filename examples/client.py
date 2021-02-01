@@ -1,20 +1,20 @@
-import pylokimq
+import pyoxenmq
 
-def do_connected(lmq, conn):
+def do_connected(mq, conn):
     print("connected via", conn)
-    return lmq.request(conn, "llarp.auth", ["dq3j4dj99w6wi4t4yjnya8sxtqr1rojt8jgnn6467o6aoenm3o3o.loki", "5:token"])
+    return mq.request(conn, "llarp.auth", ["dq3j4dj99w6wi4t4yjnya8sxtqr1rojt8jgnn6467o6aoenm3o3o.loki", "5:token"])
 
-def do_request(lmq):
+def do_request(mq):
     print('connect')
-    conn = lmq.connect_remote("ipc:///tmp/lmq.sock")
+    conn = mq.connect_remote("ipc:///tmp/lmq.sock")
     if conn:
         return do_connected(lmq, conn)
 
 def main():
-    lmq = pylokimq.LokiMQ()
+    mq = pyoxenmq.OxenMQ()
     print("start")
-    lmq.start()
-    print(do_request(lmq))
+    mq.start()
+    print(do_request(mq))
     print("done")
 
 if __name__ == '__main__':

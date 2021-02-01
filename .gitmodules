@@ -2,7 +2,7 @@
 	path = external/pybind11
 	url = https://github.com/pybind/pybind11
 	branch = stable
-[submodule "external/loki-mq"]
-	path = external/loki-mq
-	url = https://github.com/loki-project/loki-mq
+[submodule "external/oxen-mq"]
+	path = external/oxen-mq
+	url = https://github.com/oxen-io/loki-mq
 	branch = dev
