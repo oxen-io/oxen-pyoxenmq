@@ -8,10 +8,10 @@ if(CCACHE_PROGRAM)
   set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 endif()
 
-set(PROJECT_NAME pylokimq)
+set(PROJECT_NAME pyoxenmq)
 project(${PROJECT_NAME}
-    VERSION 0.0.1
-    DESCRIPTION "pybind layer for lokimq"
+    VERSION 0.1.0
+    DESCRIPTION "pybind layer for oxenmq"
     LANGUAGES CXX)
 
 
@@ -41,7 +41,7 @@ if(SUBMODULE_CHECK)
     endfunction ()
     
     check_submodule(external/pybind11)
-    check_submodule(external/loki-mq)
+    check_submodule(external/oxen-mq)
   endif()
 endif()
 
@@ -50,6 +50,6 @@ add_compile_options(-Wno-deprecated-declarations)
 add_subdirectory(external/pybind11)
 
 include(FindPkgConfig)
-pkg_check_modules(lokimq REQUIRED IMPORTED_TARGET GLOBAL liblokimq)
+pkg_check_modules(oxenmq REQUIRED IMPORTED_TARGET GLOBAL liboxenmq)
 
-add_subdirectory(pylokimq)
+add_subdirectory(pyoxenmq)

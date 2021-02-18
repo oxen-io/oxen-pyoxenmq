@@ -5,10 +5,10 @@
 
 namespace py = pybind11;
 
-namespace lokimq
+namespace oxenmq
 {
   void
-  LokiMQ_Init(py::module &mod);
+  OxenMQ_Init(py::module &mod);
 
   void
   BEncode_Init(py::module & mod);

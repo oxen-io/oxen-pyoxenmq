@@ -1,18 +1,18 @@
 #include "common.hpp"
 #include <chrono>
 #include <exception>
-#include <lokimq/lokimq.h>
-#include <lokimq/address.h>
+#include <oxenmq/oxenmq.h>
+#include <oxenmq/address.h>
 #include <pybind11/chrono.h>
 #include <pybind11/functional.h>
 #include <future>
 #include <memory>
 
-namespace lokimq
+namespace oxenmq
 {
   template <typename... Options>
-  std::future<std::vector<std::string>> LokiMQ_start_request(
-      LokiMQ& lmq,
+  std::future<std::vector<std::string>> MQ_start_request(
+      OxenMQ& omq,
       ConnectionID conn,
       std::string name,
       std::vector<py::bytes> byte_args,
@@ -25,7 +25,7 @@ namespace lokimq
 
     auto result = std::make_shared<std::promise<std::vector<std::string>>>();
     auto fut = result->get_future();
-    lmq.request(conn, std::move(name),
+    omq.request(conn, std::move(name),
         [result=std::move(result)](bool success, std::vector<std::string> value)
         {
           if (success)
@@ -70,7 +70,7 @@ namespace lokimq
   static std::mutex log_mutex;
 
   void
-  LokiMQ_Init(py::module & mod)
+  OxenMQ_Init(py::module & mod)
   {
     using namespace pybind11::literals;
     py::class_<ConnectionID>(mod, "ConnectionID")
@@ -100,7 +100,7 @@ namespace lokimq
               return l;
             });
 
-    py::class_<LokiMQ>(mod, "LokiMQ")
+    py::class_<OxenMQ>(mod, "OxenMQ")
       .def(py::init<>())
       .def(py::init([](LogLevel level) {
         // Quick and dirty logger that logs to stderr.  It would be much nicer to take a python
@@ -110,42 +110,45 @@ namespace lokimq
           std::cerr << '[' << lvl << "][" << file << ':' << line << "]: " << msg << "\n";
         }, level);
       }))
-      .def_readwrite("handshake_time", &LokiMQ::HANDSHAKE_TIME)
-      .def_readwrite("pubkey_base_routing_id", &LokiMQ::PUBKEY_BASED_ROUTING_ID)
-      .def_readwrite("max_message_size", &LokiMQ::MAX_MSG_SIZE)
-      .def_readwrite("max_sockets", &LokiMQ::MAX_SOCKETS)
-      .def_readwrite("reconnect_interval", &LokiMQ::RECONNECT_INTERVAL)
-      .def_readwrite("close_longer", &LokiMQ::CLOSE_LINGER)
-      .def_readwrite("connection_check_interval", &LokiMQ::CONN_CHECK_INTERVAL)
-      .def_readwrite("connection_heartbeat", &LokiMQ::CONN_HEARTBEAT)
-      .def_readwrite("connection_heartbeat_timeout", &LokiMQ::CONN_HEARTBEAT_TIMEOUT)
-      .def_readwrite("startup_umask", &LokiMQ::STARTUP_UMASK)
-      .def("start", &LokiMQ::start)
+      .def_readwrite("handshake_time", &OxenMQ::HANDSHAKE_TIME)
+      .def_readwrite("pubkey_base_routing_id", &OxenMQ::PUBKEY_BASED_ROUTING_ID)
+      .def_readwrite("max_message_size", &OxenMQ::MAX_MSG_SIZE)
+      .def_readwrite("max_sockets", &OxenMQ::MAX_SOCKETS)
+      .def_readwrite("reconnect_interval", &OxenMQ::RECONNECT_INTERVAL)
+      .def_readwrite("close_longer", &OxenMQ::CLOSE_LINGER)
+      .def_readwrite("connection_check_interval", &OxenMQ::CONN_CHECK_INTERVAL)
+      .def_readwrite("connection_heartbeat", &OxenMQ::CONN_HEARTBEAT)
+      .def_readwrite("connection_heartbeat_timeout", &OxenMQ::CONN_HEARTBEAT_TIMEOUT)
+      .def_readwrite("startup_umask", &OxenMQ::STARTUP_UMASK)
+      .def("start", &OxenMQ::start)
       .def("listen_plain",
-           [](LokiMQ & self, std::string path) {
+           [](OxenMQ & self, std::string path) {
              self.listen_plain(path);
            })
-      .def("listen_curve", &LokiMQ::listen_curve)
+      .def("listen_curve",
+           [](OxenMQ & self, std::string path) {
+             self.listen_curve(path);
+           })
       .def("add_tagged_thread",
-           [](LokiMQ & self, std::string name) {
+           [](OxenMQ & self, std::string name) {
              return self.add_tagged_thread(name);
            })
       .def("add_timer",
-           [](LokiMQ & self, std::chrono::milliseconds interval, std::function<void(void)> callback) {
+           [](OxenMQ & self, std::chrono::milliseconds interval, std::function<void(void)> callback) {
              self.add_timer(callback, interval);
            })
       .def("call_soon",
-           [](LokiMQ & self, std::function<void(void)> job, std::optional<TaggedThreadID> thread)
+           [](OxenMQ & self, std::function<void(void)> job, std::optional<TaggedThreadID> thread)
            {
              self.job(std::move(job), std::move(thread));
            })
       .def("add_anonymous_category",
-           [](LokiMQ & self, std::string name)
+           [](OxenMQ & self, std::string name)
            {
              self.add_category(std::move(name), AuthLevel::none);
            })
       .def("add_request_command",
-           [](LokiMQ &self,
+           [](OxenMQ &self,
               std::string category,
               std::string name,
               py::function handler)
@@ -176,7 +179,7 @@ namespace lokimq
                });
            })
       .def("add_request_command_ex",
-           [](LokiMQ &self,
+           [](OxenMQ &self,
               std::string category,
               std::string name,
               py::function handler)
@@ -207,7 +210,7 @@ namespace lokimq
                });
            })
       .def("connect_remote",
-           [](LokiMQ & self,
+           [](OxenMQ & self,
               std::string remote) -> ConnectionID
            {
              std::promise<ConnectionID> promise;
@@ -221,7 +224,7 @@ namespace lokimq
              return promise.get_future().get();
            })
       .def("request",
-           [](LokiMQ & self,
+           [](OxenMQ & self,
               ConnectionID conn,
               std::string name,
               std::vector<py::bytes> args,
@@ -236,7 +239,7 @@ namespace lokimq
            },
            "conn"_a, "name"_a, "args"_a = std::vector<py::bytes>{}, "timeout"_a = py::none{})
       .def("request_future",
-           [](LokiMQ & self,
+           [](OxenMQ & self,
               ConnectionID conn,
               std::string name,
               std::vector<py::bytes> args,
