@@ -4,5 +4,5 @@
 	branch = stable
 [submodule "external/oxen-mq"]
 	path = external/oxen-mq
-	url = https://github.com/oxen-io/loki-mq
+	url = https://github.com/oxen-io/oxen-mq
 	branch = dev
