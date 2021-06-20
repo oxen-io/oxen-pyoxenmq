@@ -178,37 +178,6 @@ namespace oxenmq
                  msg.send_reply(result);
                });
            })
-      .def("add_request_command_ex",
-           [](OxenMQ &self,
-              std::string category,
-              std::string name,
-              py::function handler)
-           {
-             self.add_request_command(category, name,
-               [handler](Message & msg) {
-                 std::string result;
-                 {
-                   py::gil_scoped_acquire gil;
-
-                   std::vector<py::bytes> data;
-                   for (auto& arg : msg.data)
-                   {
-                     data.emplace_back(arg.begin(), arg.size());
-                   }
-
-                   try
-                   {
-                     const auto obj = handler(data, msg);
-                     result = py::str(obj);
-                   }
-                   catch(std::exception & ex)
-                   {
-                     PyErr_SetString(PyExc_RuntimeError, ex.what());
-                   }
-                 }
-                 msg.send_reply(result);
-               });
-           })
       .def("connect_remote",
            [](OxenMQ & self,
               std::string remote) -> ConnectionID
