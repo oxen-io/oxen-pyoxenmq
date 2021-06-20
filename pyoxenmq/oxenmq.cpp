@@ -111,7 +111,7 @@ namespace oxenmq
         }, level);
       }))
       .def_readwrite("handshake_time", &OxenMQ::HANDSHAKE_TIME)
-      .def_readwrite("pubkey_base_routing_id", &OxenMQ::PUBKEY_BASED_ROUTING_ID)
+      .def_readwrite("ephemeral_routing_id", &OxenMQ::EPHEMERAL_ROUTING_ID)
       .def_readwrite("max_message_size", &OxenMQ::MAX_MSG_SIZE)
       .def_readwrite("max_sockets", &OxenMQ::MAX_SOCKETS)
       .def_readwrite("reconnect_interval", &OxenMQ::RECONNECT_INTERVAL)
@@ -168,37 +168,6 @@ namespace oxenmq
                    try
                    {
                      const auto obj = handler(data);
-                     result = py::str(obj);
-                   }
-                   catch(std::exception & ex)
-                   {
-                     PyErr_SetString(PyExc_RuntimeError, ex.what());
-                   }
-                 }
-                 msg.send_reply(result);
-               });
-           })
-      .def("add_request_command_ex",
-           [](OxenMQ &self,
-              std::string category,
-              std::string name,
-              py::function handler)
-           {
-             self.add_request_command(category, name,
-               [handler](Message & msg) {
-                 std::string result;
-                 {
-                   py::gil_scoped_acquire gil;
-
-                   std::vector<py::bytes> data;
-                   for (auto& arg : msg.data)
-                   {
-                     data.emplace_back(arg.begin(), arg.size());
-                   }
-
-                   try
-                   {
-                     const auto obj = handler(data, msg);
                      result = py::str(obj);
                    }
                    catch(std::exception & ex)

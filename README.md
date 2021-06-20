@@ -1,4 +1,4 @@
-# pylokimq
+# pyoxenmq
 
 pybind layer for oxenmq
 
@@ -14,8 +14,8 @@ dependencies
 
 check the source out (recursive repo):
 
-    $ git clone --recursive https://github.com/oxen-io/loki-pylokimq
-    $ cd loki-pylokimq
+    $ git clone --recursive https://github.com/oxen-io/oxen-pyoxenmq
+    $ cd oxen-pyoxenmq
 
 build:
 
