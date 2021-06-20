@@ -111,7 +111,7 @@ namespace oxenmq
         }, level);
       }))
       .def_readwrite("handshake_time", &OxenMQ::HANDSHAKE_TIME)
-      .def_readwrite("pubkey_base_routing_id", &OxenMQ::PUBKEY_BASED_ROUTING_ID)
+      .def_readwrite("ephemeral_routing_id", &OxenMQ::EPHEMERAL_ROUTING_ID)
       .def_readwrite("max_message_size", &OxenMQ::MAX_MSG_SIZE)
       .def_readwrite("max_sockets", &OxenMQ::MAX_SOCKETS)
       .def_readwrite("reconnect_interval", &OxenMQ::RECONNECT_INTERVAL)
