@@ -18,6 +18,7 @@ cd ..
 echo "$SSH_KEY" >ssh_key
 
 set -o xtrace  # Don't start tracing until *after* we write the ssh key
+set -o nullglob # So that *_all.deb below is allowed to expand to nothing if no _all packages
 
 chmod 600 ssh_key
 
