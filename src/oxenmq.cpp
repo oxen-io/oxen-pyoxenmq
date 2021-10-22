@@ -28,14 +28,8 @@ void extract_data_parts(std::vector<std::string>& parts, py::handle obj) {
     else if (py::isinstance<py::str>(obj))
         parts.push_back(obj.cast<py::str>());
     else if (py::isinstance<py::iterable>(obj)) {
-        for (auto o : obj) {
-            if (py::isinstance<py::bytes>(o))
-                parts.push_back(o.cast<py::bytes>());
-            else if (py::isinstance<py::str>(o))
-                parts.push_back(o.cast<py::str>());
-            else
-                throw std::runtime_error{"invalid iterable containing '" + std::string{py::repr(o)} + "': expected bytes/str"};
-        }
+        for (auto o : obj)
+            extract_data_parts(parts, o);
     } else {
         throw std::runtime_error{"invalid value '" + std::string{py::repr(obj)} + "': expected bytes/str/iterable"};
     }
@@ -44,12 +38,6 @@ std::vector<std::string> extract_data_parts(py::handle obj) {
     std::vector<std::string> parts;
     extract_data_parts(parts, obj);
     return parts;
-}
-std::vector<std::string> extract_data_parts(py::args& args) {
-    std::vector<std::string> data;
-    for (auto arg: args)
-        extract_data_parts(data, arg);
-    return data;
 }
 
 // Quick and dirty logger that logs to stderr.  It would be much nicer to take a python function,
@@ -63,10 +51,8 @@ struct stderr_logger {
     }
 };
 
-constexpr auto noopt = [] {};
-
 void
-OxenMQ_Init(py::module & mod)
+OxenMQ_Init(py::module& mod)
 {
     using namespace pybind11::literals;
     constexpr py::kw_only kwonly{};
@@ -114,11 +100,11 @@ If set to None then this address is set to use an unencrypted plaintext connecti
         .def_property_readonly("ipc", py::overload_cast<>(&address::ipc, py::const_), "true if this is an ipc address")
         .def_property_readonly("zmq_address", &address::zmq_address,
                 "accesses the zmq address portion of the address (note that this does not contain any curve encryption information)")
-        .def_property_readonly("full_address", [](const address &a) { return a.full_address(address::encoding::base32z); },
+        .def_property_readonly("full_address", [](const address& a) { return a.full_address(address::encoding::base32z); },
                 "returns the full address, including curve information, encoding the curve pubkey as base32z")
-        .def_property_readonly("full_address_b64", [](const address &a) { return a.full_address(address::encoding::base64); },
+        .def_property_readonly("full_address_b64", [](const address& a) { return a.full_address(address::encoding::base64); },
                 "returns the full address, including curve information, encoding the curve pubkey as base64")
-        .def_property_readonly("full_address_hex", [](const address &a) { return a.full_address(address::encoding::hex); },
+        .def_property_readonly("full_address_hex", [](const address& a) { return a.full_address(address::encoding::hex); },
                 "returns the full address, including curve information, encoding the curve pubkey as hex")
         .def_property_readonly("qr", &address::qr_address,
                 R"(Access the full address as a RQ-encoding optimized string.
@@ -173,7 +159,7 @@ Typically the IP address string for TCP connections and "localhost:UID:GID:PID" 
         .def_readonly("access", &Message::access,
                 "The access level of the invoker (which can be higher than the access level required for the command category")
         .def("dataview", [](const Message& m) {
-            py::list l{m.data.size()};
+            py::list l;
             for (auto& part : m.data)
                 l.append(py::memoryview::from_memory(part.data(), part.size()));
             return l;
@@ -185,7 +171,7 @@ Message; if you need them beyond that then you must copy them (e.g. by calling m
 or .to_bytes() on each one)"
         )
         .def("data", [](const Message& m) {
-            py::list l{m.data.size()};
+            py::list l;
             for (auto& part : m.data)
                 l.append(py::bytes{part.data(), part.size()});
             return l;
@@ -259,9 +245,22 @@ instance is still alive).)")
 
     py::class_<CatHelper>(mod, "Category",
             "Helper class to add in registering category commands, returned from OxenMQ.add_category(...)")
-        .def("add_command", &CatHelper::add_command)
+        .def("add_command", [](CatHelper& cat, std::string name, py::function cb) {
+            return cat.add_command(name, [cb=std::move(cb)](Message& m) {
+                py::gil_scoped_acquire gil;
+                cb(&m);
+            });
+        },
+        "name"_a, "callback"_a,
+        R"(Add a command handler to this category.
+
+Adds a command, that is a command that is typically some sort of instruction that requires no reply.
+(For a more typically request-response interface use .add_request_command instead).
+
+The callback is passed a `Message` object containing details of the received message.  Note that
+this object must *not* be stored beyond the callback itself; see `Message` for details.)")
         .def("add_request_command",
-                [](CatHelper &cat,
+                [](CatHelper& cat,
                     std::string name,
                     std::function<py::object(Message* msg)> handler)
                 {
@@ -283,14 +282,17 @@ instance is still alive).)")
                         }
                         msg.send_reply(send_option::data_parts(result));
                     });
+                    return &cat;
                 },
+                "name"_a, "handler"_a,
                 R"(Add a request command to this category.
 
 Adds a request command, that is, a command that is always expected to reply, to this category.  The
-callback must return one of:
+callback is passed a Message object containing details of the required message and must return one
+of:
 
 - None - no reply will be sent; typically returned because you sent it yourself (via
-  Message.send_reply()), or because you want to send it later via Message.send_later().
+  Message.reply()), or because you want to send it later via Message.later().
 - bytes - will be sent as is in a single-part reply.
 - str - will be sent in utf-8 encoding in a single-part reply.
 - iterable object containing bytes and/or str elements: will be sent as a multi-part reply where
@@ -306,19 +308,19 @@ callback itself.)")
 
     py::class_<OxenMQ> oxenmq{mod, "OxenMQ"};
     oxenmq
-        .def(py::init<>())
-        .def(py::init([](LogLevel level) {
-            // Quick and dirty logger that logs to stderr.  It would be much nicer to take a python
-            // function, but that deadlocks pretty much right away because of the crappiness of the gil.
-            return std::make_unique<OxenMQ>(stderr_logger{}, level);
-        }))
-        .def(py::init([](py::bytes pubkey, py::bytes privkey, bool sn, OxenMQ::SNRemoteAddress sn_lookup, std::optional<LogLevel> log_level) {
+        .def(py::init([](
+                        py::bytes pubkey,
+                        py::bytes privkey,
+                        bool sn,
+                        OxenMQ::SNRemoteAddress sn_lookup,
+                        std::optional<LogLevel> log_level) {
             return std::make_unique<OxenMQ>(pubkey, privkey, sn, std::move(sn_lookup),
                     log_level ? OxenMQ::Logger{stderr_logger{}} : nullptr,
                     log_level.value_or(LogLevel::warn));
         }),
-                "pubkey"_a = "", "privkey"_a = "", "service_node"_a = false,
-                "sn_lookup"_a = nullptr, "log_level"_a = LogLevel::warn,
+                kwonly,
+                "pubkey"_a = py::bytes(), "privkey"_a = py::bytes(), "service_node"_a = false,
+                "sn_lookup"_a = py::none(), "log_level"_a = py::none(),
                 R"(OxenMQ constructor.
 
 This constructs the object but does not start it; you will typically want to first add categories
@@ -602,17 +604,17 @@ permissions: in this example, the required permissions the access the endpoint w
                     const address& remote,
                     OxenMQ::ConnectSuccess on_success,
                     OxenMQ::ConnectFailure on_failure,
-                    std::optional<std::chrono::milliseconds> timeout,
+                    std::chrono::milliseconds timeout,
                     std::optional<bool> ephemeral_routing_id) {
 
             return self.connect_remote(remote, std::move(on_success), std::move(on_failure), 
-                    connect_option::timeout{timeout.value_or(oxenmq::REMOTE_CONNECT_TIMEOUT)},
+                    connect_option::timeout{timeout},
                     connect_option::ephemeral_routing_id{ephemeral_routing_id.value_or(self.EPHEMERAL_ROUTING_ID)}
                     );
         },
         "remote"_a, "on_success"_a, "on_failure"_a,
         kwonly,
-        "timeout"_a = std::nullopt, "ephemeral_routing_id"_a = std::nullopt,
+        "timeout"_a = oxenmq::REMOTE_CONNECT_TIMEOUT, "ephemeral_routing_id"_a = std::nullopt,
         R"(
 Starts connecting to a remote address and return immediately.  The connection can be used
 immediately, however messages will only be queued until the connection is established (or dropped if
@@ -621,7 +623,10 @@ the connection fails).  The given callbacks are invoked for success or failure.
 `ephemeral_routing_id` and `timeout` allowing overriding the defaults (oxenmq.EPHEMERAL_ROUTING_ID
 and 10s, respectively).
 )")
-        .def("connect_remote", [](OxenMQ& self, const address& remote, std::chrono::milliseconds timeout) {
+        .def("connect_remote", [](OxenMQ& self,
+                    const address& remote,
+                    std::chrono::milliseconds timeout,
+                    std::optional<bool> ephemeral_routing_id) {
             std::promise<ConnectionID> promise;
             self.connect_remote(
                     remote,
@@ -629,9 +634,12 @@ and 10s, respectively).
                     [&promise](auto, std::string_view reason) {
                         promise.set_exception(std::make_exception_ptr(
                                     std::runtime_error{"Connection failed: " + std::string{reason}}));
-                    });
+                    },
+                    oxenmq::connect_option::timeout{timeout},
+                    connect_option::ephemeral_routing_id{ephemeral_routing_id.value_or(self.EPHEMERAL_ROUTING_ID)}
+                    );
             return promise.get_future().get();
-        }, "remote"_a, "timeout"_a = oxenmq::REMOTE_CONNECT_TIMEOUT,
+        }, "remote"_a, "timeout"_a = oxenmq::REMOTE_CONNECT_TIMEOUT, "ephemeral_routing_id"_a = std::nullopt,
         R"(Simpler version of connect_remote that connects to a remote address synchronously.
 
 This will block until the connection is established or times out; throws on connection failure,
@@ -685,6 +693,9 @@ send/request methods to send to the SN by pubkey.
 Connects to the built-in in-process listening socket of this OxenMQ server for local communication.
 Note that auth_level defaults to admin (unlike connect_remote), and the default timeout is much
 shorter.
+
+This connection is designed to allow code within the same process to invoke registered commands via
+the OxenMQ object.  The connection works whether or not there are any accessible external listeners.
 
 Also note that incoming inproc requests are unauthenticated: that is, they will always have
 admin-level access.
@@ -746,29 +757,38 @@ the background).)")
                 extract_data_parts(data, arg);
 
             if (!request) {
-                self.send(std::get<ConnectionID>(conn), command,
+                self.send(std::get<ConnectionID>(conn), command, send_option::data_parts(data),
                         hint, optional, incoming, outgoing, keep_alive, request_timeout,
                         std::move(qfail), std::move(qfull));
             } else {
                 auto reply_cb = [on_reply = std::move(on_reply), on_fail = std::move(on_reply_failure)]
-                    (bool success, std::vector<std::string> data) {
-
-                        if (success ? !on_reply : !on_fail)
-                            return;
+                    (bool success, std::vector<std::string> data) mutable {
+                        // The gil here makes things tricky: the function invocation itself is
+                        // already gil protected, but the *destruction* of the lambda isn't, and
+                        // that breaks things because the destruction frees a python reference to
+                        // the callback.  However oxenmq invokes this callback exactly once so we
+                        // can deal with it by stealing the captures out of the lambda to force
+                        // destruction here, with the gil held.
                         py::gil_scoped_acquire gil;
+                        auto reply = std::move(on_reply);
+                        auto fail = std::move(on_fail);
+
+                        if (success ? !reply : !fail)
+                            return;
                         py::list l;
                         if (success) {
                             for (const auto& part : data)
                                 l.append(py::memoryview::from_memory(part.data(), part.size()));
-                            (*on_reply)(l);
+                            (*reply)(l);
                         } else if (on_fail) {
                             for (const auto& part : data)
                                 l.append(py::bytes(part.data(), part.size()));
-                            (*on_fail)(l);
+                            (*fail)(l);
                         }
                     };
 
                 self.request(std::get<ConnectionID>(conn), command, std::move(reply_cb),
+                        send_option::data_parts(data),
                         hint, optional, incoming, outgoing, keep_alive, request_timeout,
                         std::move(qfail), std::move(qfull));
             }
@@ -905,12 +925,13 @@ OxenMQ requests so that both are treated fairly in terms of processing priority.
 
         auto result = std::make_shared<std::promise<py::list>>();
         auto fut = result->get_future();
-        auto on_reply = [result](py::list value) {
+        std::function on_reply = [result](py::list value) {
             assert(len(value) == 0 || py::isinstance<py::memoryview>(value[0]));
             for (int i = len(value) - 1; i >= 0; i--)
                 value[i] = value[i].attr("tobytes")();
+            result->set_value(std::move(value));
         };
-        auto on_fail = [result](py::list value) {
+        std::function on_fail = [result](py::list value) {
             if (len(value) > 0 && (std::string) py::bytes(value[0]) == "TIMEOUT"sv) {
                 auto msg = len(value) > 1 ? (std::string) py::bytes(value[1]) : "Request timed out"s;
                 PyErr_SetString(PyExc_TimeoutError, msg.c_str());
