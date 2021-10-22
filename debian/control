@@ -1,0 +1,17 @@
+Source: pyoxenmq
+Priority: optional
+Maintainer: Jason Rhinelander <jason@oxen.io>
+Build-Depends: debhelper-compat (= 11), liboxenmq-dev (>= 1.2.8~), pybind11-dev, python3-pybind11, python3-all-dev, dh-python
+Standards-Version: 4.4.1
+Section: python
+Homepage: https://github.com/oxen-io/oxen-pyoxenmq
+
+Package: python3-oxenmq
+Architecture: any
+Depends: ${misc:Depends}, ${python3:Depends}, ${shlibs:Depends}
+Description: zeromq-based Oxen message passing library (Python wrapper)
+ OxenMQ is a message queuing library for high performance inter-node
+ communications.
+ .
+ This package contains the python wrapper around OxenMQ use to communication
+ with other OxenMQ clients from Python.
