@@ -11,23 +11,9 @@ project(pyoxenmq
     DESCRIPTION "python interface to OxenMQ"
     LANGUAGES CXX)
 
-add_subdirectory(pybind11)
-
-pybind11_add_module(pyoxenmq MODULE
-    bencode.cpp
-    oxenmq.cpp
-    module.cpp
-    )
-
-target_compile_features(pyoxenmq PRIVATE cxx_std_17)
-
-if(TARGET oxenmq::oxenmq)
-    target_link_libraries(pyoxenmq PRIVATE oxenmq::oxenmq)
-else()
-    include(FindPkgConfig)
-    pkg_check_modules(oxenmq REQUIRED IMPORTED_TARGET liboxenmq>=1.2.8)
-    target_link_libraries(pyoxenmq PUBLIC PkgConfig::oxenmq)
-endif()
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(SUBMODULE_CHECK "Enables checking that vendored library submodules are up to date" ON)
 if(SUBMODULE_CHECK)
@@ -51,13 +37,16 @@ endif()
 
 add_subdirectory(external/pybind11)
 
-include(FindPkgConfig)
-pkg_check_modules(oxenmq REQUIRED IMPORTED_TARGET GLOBAL liboxenmq)
-
 pybind11_add_module(oxenmq MODULE
     src/bencode.cpp
-    src/bencode.cppoxenmq.cpp
+    src/oxenmq.cpp
     src/module.cpp
 )
 
-target_link_libraries(oxenmq PUBLIC PkgConfig::oxenmq)
+if(TARGET oxenmq::oxenmq)
+    target_link_libraries(pyoxenmq PRIVATE oxenmq::oxenmq)
+else()
+    include(FindPkgConfig)
+    pkg_check_modules(oxenmq REQUIRED IMPORTED_TARGET liboxenmq>=1.2.8)
+    target_link_libraries(oxenmq PRIVATE PkgConfig::oxenmq)
+endif()
