@@ -39,6 +39,8 @@ fi
 for deb in "${debs[@]}"; do
     put+=$'\n'"put $deb $upload_to"
 
+    echo -e "\n\n\e[35;1m$deb info:\e[0m"
+    dpkg-deb --info $deb
     echo -e "\n\n\e[35;1m$deb contents:\e[0m"
     dpkg-deb --contents $deb
 done
