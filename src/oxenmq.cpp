@@ -66,7 +66,7 @@ struct stderr_logger {
 constexpr auto noopt = [] {};
 
 void
-OxenMQ_Init(py::module & mod)
+OxenMQ_Init(py::module& mod)
 {
     using namespace pybind11::literals;
     constexpr py::kw_only kwonly{};
@@ -114,11 +114,11 @@ If set to None then this address is set to use an unencrypted plaintext connecti
         .def_property_readonly("ipc", py::overload_cast<>(&address::ipc, py::const_), "true if this is an ipc address")
         .def_property_readonly("zmq_address", &address::zmq_address,
                 "accesses the zmq address portion of the address (note that this does not contain any curve encryption information)")
-        .def_property_readonly("full_address", [](const address &a) { return a.full_address(address::encoding::base32z); },
+        .def_property_readonly("full_address", [](const address& a) { return a.full_address(address::encoding::base32z); },
                 "returns the full address, including curve information, encoding the curve pubkey as base32z")
-        .def_property_readonly("full_address_b64", [](const address &a) { return a.full_address(address::encoding::base64); },
+        .def_property_readonly("full_address_b64", [](const address& a) { return a.full_address(address::encoding::base64); },
                 "returns the full address, including curve information, encoding the curve pubkey as base64")
-        .def_property_readonly("full_address_hex", [](const address &a) { return a.full_address(address::encoding::hex); },
+        .def_property_readonly("full_address_hex", [](const address& a) { return a.full_address(address::encoding::hex); },
                 "returns the full address, including curve information, encoding the curve pubkey as hex")
         .def_property_readonly("qr", &address::qr_address,
                 R"(Access the full address as a RQ-encoding optimized string.
@@ -261,7 +261,7 @@ instance is still alive).)")
             "Helper class to add in registering category commands, returned from OxenMQ.add_category(...)")
         .def("add_command", &CatHelper::add_command)
         .def("add_request_command",
-                [](CatHelper &cat,
+                [](CatHelper& cat,
                     std::string name,
                     std::function<py::object(Message* msg)> handler)
                 {
@@ -312,7 +312,12 @@ callback itself.)")
             // function, but that deadlocks pretty much right away because of the crappiness of the gil.
             return std::make_unique<OxenMQ>(stderr_logger{}, level);
         }))
-        .def(py::init([](py::bytes pubkey, py::bytes privkey, bool sn, OxenMQ::SNRemoteAddress sn_lookup, std::optional<LogLevel> log_level) {
+        .def(py::init([](
+                        py::bytes pubkey,
+                        py::bytes privkey,
+                        bool sn,
+                        OxenMQ::SNRemoteAddress sn_lookup,
+                        std::optional<LogLevel> log_level) {
             return std::make_unique<OxenMQ>(pubkey, privkey, sn, std::move(sn_lookup),
                     log_level ? OxenMQ::Logger{stderr_logger{}} : nullptr,
                     log_level.value_or(LogLevel::warn));
