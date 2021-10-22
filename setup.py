@@ -26,6 +26,5 @@ setup(
     description="Python wrapper for oxen-mq message passing library",
     long_description="",
     ext_modules=ext_modules,
-    cmdclass={"build_ext": build_ext},
     zip_safe=False,
 )
