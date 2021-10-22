@@ -49,7 +49,7 @@ local debian_pipeline(name,
                 ) + [
                   'eatmydata ' + apt_get_quiet + ' dist-upgrade -y',
                   'eatmydata ' + apt_get_quiet + ' install --no-install-recommends -y ' + std.join(' ', deps),
-                  'pip3 install . -v',
+                  'CFLAGS="-Wextra -Werror -fdiagnostics-color" pip3 install . -v',
                   'py.test-3 -v --color=yes',
                 ]
                 + extra_cmds,
