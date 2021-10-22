@@ -10,6 +10,7 @@ pyoxenmq (1.0.0-2~deb10) buster; urgency=medium
   * Hacking around for macos
   * Build with -Wextra -Werror and color
   * Fixes and address warnings
+  * Update readme for new code
 
  -- Jason Rhinelander <jason@imaginary.ca>  Fri, 22 Oct 2021 20:15:26 -0300
 
