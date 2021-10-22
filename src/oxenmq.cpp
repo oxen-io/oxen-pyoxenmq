@@ -51,8 +51,6 @@ struct stderr_logger {
     }
 };
 
-constexpr auto noopt = [] {};
-
 void
 OxenMQ_Init(py::module& mod)
 {
@@ -606,17 +604,17 @@ permissions: in this example, the required permissions the access the endpoint w
                     const address& remote,
                     OxenMQ::ConnectSuccess on_success,
                     OxenMQ::ConnectFailure on_failure,
-                    std::optional<std::chrono::milliseconds> timeout,
+                    std::chrono::milliseconds timeout,
                     std::optional<bool> ephemeral_routing_id) {
 
             return self.connect_remote(remote, std::move(on_success), std::move(on_failure), 
-                    connect_option::timeout{timeout.value_or(oxenmq::REMOTE_CONNECT_TIMEOUT)},
+                    connect_option::timeout{timeout},
                     connect_option::ephemeral_routing_id{ephemeral_routing_id.value_or(self.EPHEMERAL_ROUTING_ID)}
                     );
         },
         "remote"_a, "on_success"_a, "on_failure"_a,
         kwonly,
-        "timeout"_a = std::nullopt, "ephemeral_routing_id"_a = std::nullopt,
+        "timeout"_a = oxenmq::REMOTE_CONNECT_TIMEOUT, "ephemeral_routing_id"_a = std::nullopt,
         R"(
 Starts connecting to a remote address and return immediately.  The connection can be used
 immediately, however messages will only be queued until the connection is established (or dropped if
@@ -625,7 +623,10 @@ the connection fails).  The given callbacks are invoked for success or failure.
 `ephemeral_routing_id` and `timeout` allowing overriding the defaults (oxenmq.EPHEMERAL_ROUTING_ID
 and 10s, respectively).
 )")
-        .def("connect_remote", [](OxenMQ& self, const address& remote, std::chrono::milliseconds timeout) {
+        .def("connect_remote", [](OxenMQ& self,
+                    const address& remote,
+                    std::chrono::milliseconds timeout,
+                    std::optional<bool> ephemeral_routing_id) {
             std::promise<ConnectionID> promise;
             self.connect_remote(
                     remote,
@@ -633,9 +634,12 @@ and 10s, respectively).
                     [&promise](auto, std::string_view reason) {
                         promise.set_exception(std::make_exception_ptr(
                                     std::runtime_error{"Connection failed: " + std::string{reason}}));
-                    });
+                    },
+                    oxenmq::connect_option::timeout{timeout},
+                    connect_option::ephemeral_routing_id{ephemeral_routing_id.value_or(self.EPHEMERAL_ROUTING_ID)}
+                    );
             return promise.get_future().get();
-        }, "remote"_a, "timeout"_a = oxenmq::REMOTE_CONNECT_TIMEOUT,
+        }, "remote"_a, "timeout"_a = oxenmq::REMOTE_CONNECT_TIMEOUT, "ephemeral_routing_id"_a = std::nullopt,
         R"(Simpler version of connect_remote that connects to a remote address synchronously.
 
 This will block until the connection is established or times out; throws on connection failure,
