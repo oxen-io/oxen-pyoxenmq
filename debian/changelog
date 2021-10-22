@@ -1,3 +1,22 @@
+pyoxenmq (1.0.0-2) sid; urgency=medium
+
+  * Add ci config to build debs
+  * Add missing debian/source files
+  * Unbreak ci upload script when no all-arch debs
+  * fix
+  * Show --info in log as well
+  * De-Frankenstein the build
+  * Formatting
+  * Remove cmake build system and submodules
+  * Various fixes for bugs revealed in testing
+  * Add simple pytest tests
+  * Add drone build & tests
+  * Hacking around for macos
+  * Build with -Wextra -Werror and color
+  * Fixes and address warnings
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Fri, 22 Oct 2021 20:15:18 -0300
+
 pyoxenmq (1.0.0-1) sid; urgency=medium
 
   * Initial release.
