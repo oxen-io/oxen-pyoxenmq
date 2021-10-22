@@ -1,4 +1,4 @@
-pyoxenmq (1.0.0-1) sid; urgency=medium
+pyoxenmq (1.0.0-1~ubuntu2104) hirsute; urgency=medium
 
   * Initial release.
 
