@@ -1,27 +1,21 @@
 # pyoxenmq
 
-pybind layer for oxenmq
+Python interface to OxenMQ
 
 ## building
 
 dependencies
 
+- python3-pip
 - python3-dev
-- cmake 
-- pkg-config 
+- pybind11-dev
 - liboxenmq-dev
 
+Check the source out with
 
-check the source out (recursive repo):
-
-    $ git clone --recursive https://github.com/oxen-io/oxen-pyoxenmq
+    $ git clone https://github.com/oxen-io/oxen-pyoxenmq
     $ cd oxen-pyoxenmq
 
-build:
+Install using:
 
-    $ python3 setup.py build
-    
-install as user:
-
-    $ python3 setup.py install --user
-
+    $ pip3 install .
