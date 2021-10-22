@@ -1,3 +1,18 @@
+pyoxenmq (1.0.0-2~deb10) buster; urgency=medium
+
+  * Build buster using backports
+  * De-Frankenstein the build
+  * Formatting
+  * Remove cmake build system and submodules
+  * Various fixes for bugs revealed in testing
+  * Add simple pytest tests
+  * Add drone build & tests
+  * Hacking around for macos
+  * Build with -Wextra -Werror and color
+  * Fixes and address warnings
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Fri, 22 Oct 2021 20:15:26 -0300
+
 pyoxenmq (1.0.0-1~deb10) buster; urgency=medium
 
   * Initial release.
