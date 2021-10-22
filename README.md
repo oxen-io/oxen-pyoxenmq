@@ -1,19 +1,21 @@
-# pylokimq
+# pyoxenmq
 
-pybind layer for lokimq
+Python interface to OxenMQ
 
 ## building
 
-check the source out (recursive repo):
+dependencies
 
-    $ git clone --recursive https://github.com/loki-project/loki-pylokimq
-    $ cd loki-pylokimq
+- python3-pip
+- python3-dev
+- pybind11-dev
+- liboxenmq-dev
 
-build:
+Check the source out with
 
-    $ python3 setup.py build
-    
-install as user:
+    $ git clone https://github.com/oxen-io/oxen-pyoxenmq
+    $ cd oxen-pyoxenmq
 
-    $ python3 setup.py install --user
+Install using:
 
+    $ pip3 install .
