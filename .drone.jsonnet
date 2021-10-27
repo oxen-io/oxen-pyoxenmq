@@ -1,6 +1,6 @@
 local distro = 'focal';
-local distro_name = 'Ubuntu 20.04 (focal)';
-local distro_docker = 'ubuntu:focal';
+local distro_name = 'Ubuntu ' + distro;
+local distro_docker = 'registry.oxen.rocks/lokinet-ci-ubuntu-' + distro + '-builder';
 
 local apt_get_quiet = 'apt-get -o=Dpkg::Use-Pty=0 -q';
 
