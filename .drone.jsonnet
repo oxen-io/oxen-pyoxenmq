@@ -1,6 +1,6 @@
 local distro = 'buster';
-local distro_name = 'Debian 10 (buster)';
-local distro_docker = 'debian:buster';
+local distro_name = 'Debian ' + distro;
+local distro_docker = 'registry.oxen.rocks/lokinet-ci-debian-' + distro + '-builder';
 
 local apt_get_quiet = 'apt-get -o=Dpkg::Use-Pty=0 -q';
 
