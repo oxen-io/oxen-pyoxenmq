@@ -1,3 +1,9 @@
+pyoxenmq (1.0.0-3~ubuntu2004) focal; urgency=medium
+
+  * use prebuilt builder ci; reformat
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Tue, 30 Nov 2021 15:24:11 -0400
+
 pyoxenmq (1.0.0-2~ubuntu2004) focal; urgency=medium
 
   * Disable arm because we rely on a backported pybind
