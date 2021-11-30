@@ -1,3 +1,9 @@
+pyoxenmq (1.0.0-3~deb10) buster; urgency=medium
+
+  * use prebuilt builder ci; reformat
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Tue, 30 Nov 2021 15:24:08 -0400
+
 pyoxenmq (1.0.0-2~deb10) buster; urgency=medium
 
   * Build buster using backports
