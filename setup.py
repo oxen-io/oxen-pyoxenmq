@@ -3,7 +3,7 @@ from setuptools import setup
 # Available at setup time due to pyproject.toml
 from pybind11.setup_helpers import Pybind11Extension, build_ext
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 # Note:
 #   Sort input source files if you glob sources to ensure bit-for-bit

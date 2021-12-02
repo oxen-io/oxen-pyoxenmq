@@ -6,6 +6,7 @@
 #include <pybind11/attr.h>
 #include <pybind11/chrono.h>
 #include <pybind11/functional.h>
+#include <pybind11/gil.h>
 #include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/pytypes.h>
@@ -436,8 +437,19 @@ Things you want to do before calling this:
         .def("listen", [](OxenMQ& self,
                     std::string bind,
                     bool curve,
-                    OxenMQ::AllowFunc allow,
+                    py::function pyallow,
                     std::function<void(bool success)> on_bind) {
+            OxenMQ::AllowFunc allow;
+            if (!pyallow.is_none())
+                // We need to wrap this to pass the pubkey as bytes (otherwise pybind tries to utf-8
+                // encode it).
+                allow = [pyallow=std::move(pyallow)](std::string_view addr, std::string_view pubkey, bool sn) {
+                    py::gil_scoped_acquire gil;
+                    return py::cast<AuthLevel>(
+                        pyallow(addr, py::bytes{pubkey.data(), pubkey.size()}, sn)
+                    );
+                };
+
             if (curve)
                 self.listen_curve(bind, std::move(allow), std::move(on_bind));
             else
@@ -463,9 +475,12 @@ Parameters:
 
 - allow_connection function to call to determine whether to allow the connection and, if so, the
   authentication level it receives.  The function is called with the remote's address, the remote's
-  32-byte pubkey (only for curve; empty for plaintext), and whether the remote is recognized as a
-  service node (always False for plaintext; requires sn_lookup being configured in construction).
-  If omitted (or null) the default returns AuthLevel::none access for all incoming connections.
+  32-byte pubkey as bytes (only for curve; empty for plaintext), and whether the remote is
+  recognized as a service node (always False for plaintext; requires sn_lookup being configured in
+  construction).
+
+  The function must return a AuthLevel value to accept the connection, or AuthLevel.denied to refuse
+  it.  If omitted (or null) the default returns AuthLevel.none access for all incoming connections.
 
 - on_bind a callback to invoke when the port has been successfully opened or failed to open, called
   with a single boolean argument of True for success, False for failure.  For addresses set up
