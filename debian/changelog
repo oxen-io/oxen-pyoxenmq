@@ -1,8 +1,9 @@
 pyoxenmq (1.0.1-1~ubuntu2004) focal; urgency=medium
 
+  * Remove include for older pybind compatibility
   * Fix allow function argument decoding error
 
- -- Jason Rhinelander <jason@imaginary.ca>  Thu, 02 Dec 2021 15:21:02 -0400
+ -- Jason Rhinelander <jason@imaginary.ca>  Thu, 02 Dec 2021 15:41:39 -0400
 
 pyoxenmq (1.0.0-3~ubuntu2004) focal; urgency=medium
 
