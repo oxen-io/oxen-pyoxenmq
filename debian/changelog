@@ -1,3 +1,9 @@
+pyoxenmq (1.0.1-2~ubuntu2110) impish; urgency=medium
+
+  * Rebuild against oxenmq 1.2.10
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Thu, 02 Dec 2021 19:18:23 -0400
+
 pyoxenmq (1.0.1-1~ubuntu2110) impish; urgency=medium
 
   * Remove include for older pybind compatibility
