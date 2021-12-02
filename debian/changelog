@@ -1,3 +1,9 @@
+pyoxenmq (1.0.1-2~deb10) buster; urgency=medium
+
+  * Rebuild against oxenmq 1.2.10
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Thu, 02 Dec 2021 19:18:10 -0400
+
 pyoxenmq (1.0.1-1~deb10) buster; urgency=medium
 
   * Remove include for older pybind compatibility
