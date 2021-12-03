@@ -1,3 +1,12 @@
+pyoxenmq (1.0.2-1~ubuntu2104) hirsute; urgency=medium
+
+  * Make ConnectionIDs hashable
+  * Make allow_connection properly optional
+  * Make Message property accessors copy
+  * Version bump
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Fri, 03 Dec 2021 15:41:46 -0400
+
 pyoxenmq (1.0.1-2~ubuntu2104) hirsute; urgency=medium
 
   * Rebuild against oxenmq 1.2.10
