@@ -62,6 +62,7 @@ OxenMQ_Init(py::module& mod)
         .def(py::self != py::self)
         .def_property_readonly("service_node", &ConnectionID::sn)
         .def_property_readonly("pubkey", [](const ConnectionID& c) { return py::bytes(c.pubkey()); })
+        .def(py::hash(py::self))
         ;
     py::class_<address>(mod, "Address")
         .def(py::init<std::string_view>(), "addr"_a,
@@ -152,11 +153,13 @@ This typically protects administrative commands like shutting down or access to 
     msg
         .def_property_readonly("is_reply", [](const Message& m) { return !m.reply_tag.empty(); },
                 "True if this message is expecting a reply (i.e. it was received on a request_command endpoint)")
-        .def_readonly("remote", &Message::remote, R"(Some sort of remote address from which the request came.
+        .def_readonly("remote", &Message::remote, py::return_value_policy::copy,
+                R"(Some sort of remote address from which the request came.
 
 Typically the IP address string for TCP connections and "localhost:UID:GID:PID" for unix socket IPC connections.)")
-        .def_readonly("conn", &Message::conn, "The connection ID info for routing a reply")
-        .def_readonly("access", &Message::access,
+        .def_readonly("conn", &Message::conn, py::return_value_policy::copy,
+                "The connection ID info for routing a reply")
+        .def_readonly("access", &Message::access, py::return_value_policy::copy,
                 "The access level of the invoker (which can be higher than the access level required for the command category")
         .def("dataview", [](const Message& m) {
             py::list l;
@@ -436,13 +439,13 @@ Things you want to do before calling this:
         .def("listen", [](OxenMQ& self,
                     std::string bind,
                     bool curve,
-                    py::function pyallow,
+                    std::optional<py::function> pyallow,
                     std::function<void(bool success)> on_bind) {
             OxenMQ::AllowFunc allow;
-            if (!pyallow.is_none())
+            if (pyallow)
                 // We need to wrap this to pass the pubkey as bytes (otherwise pybind tries to utf-8
                 // encode it).
-                allow = [pyallow=std::move(pyallow)](std::string_view addr, std::string_view pubkey, bool sn) {
+                allow = [pyallow=std::move(*pyallow)](std::string_view addr, std::string_view pubkey, bool sn) {
                     py::gil_scoped_acquire gil;
                     return py::cast<AuthLevel>(
                         pyallow(addr, py::bytes{pubkey.data(), pubkey.size()}, sn)
@@ -454,7 +457,7 @@ Things you want to do before calling this:
             else
                 self.listen_plain(bind, std::move(allow), std::move(on_bind));
         },
-        "bind"_a, "curve"_a, kwonly, "allow_connection"_a = nullptr, "on_bind"_a = nullptr,
+        "bind"_a, "curve"_a, kwonly, "allow_connection"_a = std::nullopt, "on_bind"_a = nullptr,
         R"(Start listening on the given bind address.
 
 Incoming connections can come from anywhere.  `allow_connection` is invoked for any incoming
