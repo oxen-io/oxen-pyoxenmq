@@ -153,11 +153,13 @@ This typically protects administrative commands like shutting down or access to 
     msg
         .def_property_readonly("is_reply", [](const Message& m) { return !m.reply_tag.empty(); },
                 "True if this message is expecting a reply (i.e. it was received on a request_command endpoint)")
-        .def_readonly("remote", &Message::remote, R"(Some sort of remote address from which the request came.
+        .def_readonly("remote", &Message::remote, py::return_value_policy::copy,
+                R"(Some sort of remote address from which the request came.
 
 Typically the IP address string for TCP connections and "localhost:UID:GID:PID" for unix socket IPC connections.)")
-        .def_readonly("conn", &Message::conn, "The connection ID info for routing a reply")
-        .def_readonly("access", &Message::access,
+        .def_readonly("conn", &Message::conn, py::return_value_policy::copy,
+                "The connection ID info for routing a reply")
+        .def_readonly("access", &Message::access, py::return_value_policy::copy,
                 "The access level of the invoker (which can be higher than the access level required for the command category")
         .def("dataview", [](const Message& m) {
             py::list l;
