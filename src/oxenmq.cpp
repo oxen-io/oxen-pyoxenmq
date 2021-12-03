@@ -62,6 +62,7 @@ OxenMQ_Init(py::module& mod)
         .def(py::self != py::self)
         .def_property_readonly("service_node", &ConnectionID::sn)
         .def_property_readonly("pubkey", [](const ConnectionID& c) { return py::bytes(c.pubkey()); })
+        .def(py::hash(py::self))
         ;
     py::class_<address>(mod, "Address")
         .def(py::init<std::string_view>(), "addr"_a,
