@@ -1,3 +1,9 @@
+pyoxenmq (1.0.2-1~ubuntu2110+1) impish; urgency=medium
+
+  * Rebuild
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Wed, 30 Mar 2022 18:02:19 -0300
+
 pyoxenmq (1.0.2-1~ubuntu2110) impish; urgency=medium
 
   * Make ConnectionIDs hashable
