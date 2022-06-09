@@ -151,7 +151,7 @@ This typically protects administrative commands like shutting down or access to 
 
     py::class_<Message> msg(mod, "Message", "Temporary object containing details of a just-received message");
     msg
-        .def_property_readonly("is_reply", [](const Message& m) { return !m.reply_tag.empty(); },
+        .def_property_readonly("is_request", [](const Message& m) { return !m.reply_tag.empty(); },
                 "True if this message is expecting a reply (i.e. it was received on a request_command endpoint)")
         .def_readonly("remote", &Message::remote, py::return_value_policy::copy,
                 R"(Some sort of remote address from which the request came.
@@ -187,7 +187,7 @@ or .to_bytes() on each one)"
         R"(Sends a reply back to this caller.
 
 `args` must be bytes, str, or iterables thereof (and will be flatted).  Should only be used from a
-request_command endpoint (i.e. when .is_reply is true)")
+request_command endpoint (i.e. when .is_request is true)")
         .def("back", [](Message& m, std::string command, py::args args) {
             m.send_back(command, send_option::data_parts(extract_data_parts(args)));
         },
@@ -223,7 +223,7 @@ instance is still alive).)")
         ;
 
     py::class_<Message::DeferredSend>(msg, "DeferredSend")
-        .def_property_readonly("is_reply", [](const Message::DeferredSend& m) { return !m.reply_tag.empty(); },
+        .def_property_readonly("is_request", [](const Message::DeferredSend& m) { return !m.reply_tag.empty(); },
                 "True if this message is expecting a reply (i.e. it was received on a request_command endpoint)")
         .def("reply", [](Message::DeferredSend& d, py::args args) {
             d.reply(send_option::data_parts(extract_data_parts(args)));
