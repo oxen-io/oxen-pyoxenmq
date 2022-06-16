@@ -1,3 +1,9 @@
+pyoxenmq (1.0.2-2~deb12) bookworm; urgency=medium
+
+  * fix compilation with newer gcc
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Thu, 16 Jun 2022 15:06:34 -0300
+
 pyoxenmq (1.0.2-1~deb12) bookworm; urgency=medium
 
   * bookworm deb
