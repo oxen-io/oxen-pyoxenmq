@@ -736,7 +736,7 @@ the background).)")
             if (auto* bytes = std::get_if<py::bytes>(&conn)) {
                 if (len(*bytes) != 32)
                     throw std::logic_error{"Error: send(...) to=pubkey requires 32-byte pubkey"};
-                conn.emplace<ConnectionID>(*bytes);
+                conn.emplace<ConnectionID>(static_cast<std::string>(*bytes));
             }
 
             bool request = kwargs.contains("request") && kwargs["request"].cast<bool>();
