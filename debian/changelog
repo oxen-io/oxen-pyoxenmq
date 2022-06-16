@@ -1,3 +1,9 @@
+pyoxenmq (1.0.2-2) sid; urgency=medium
+
+  * compilation fix for newer gcc
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Thu, 16 Jun 2022 15:04:29 -0300
+
 pyoxenmq (1.0.2-1) sid; urgency=medium
 
   * Make ConnectionIDs hashable
