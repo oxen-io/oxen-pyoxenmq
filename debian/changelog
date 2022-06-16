@@ -1,3 +1,9 @@
+pyoxenmq (1.0.2-1~ubuntu2210) kinetic; urgency=medium
+
+  * kinetic deb
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Thu, 16 Jun 2022 14:59:41 -0300
+
 pyoxenmq (1.0.2-1~ubuntu2204) jammy; urgency=medium
 
   * jammy deb
