@@ -1,3 +1,9 @@
+pyoxenmq (1.0.2-1~ubuntu2204) jammy; urgency=medium
+
+  * jammy deb
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Thu, 16 Jun 2022 14:48:31 -0300
+
 pyoxenmq (1.0.2-1~ubuntu2110+1) impish; urgency=medium
 
   * Rebuild
