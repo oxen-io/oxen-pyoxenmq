@@ -1,4 +1,3 @@
-#include "common.hpp"
 #include <chrono>
 #include <exception>
 #include <oxenmq/oxenmq.h>
@@ -13,6 +12,8 @@
 #include <future>
 #include <memory>
 #include <variant>
+
+namespace py = pybind11;
 
 namespace oxenmq {
 
@@ -51,8 +52,7 @@ struct stderr_logger {
     }
 };
 
-void
-OxenMQ_Init(py::module& mod)
+PYBIND11_MODULE(oxenmq, mod)
 {
     using namespace pybind11::literals;
     constexpr py::kw_only kwonly{};

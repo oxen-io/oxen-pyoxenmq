@@ -3,7 +3,7 @@ from setuptools import setup
 # Available at setup time due to pyproject.toml
 from pybind11.setup_helpers import Pybind11Extension, build_ext
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 # Note:
 #   Sort input source files if you glob sources to ensure bit-for-bit
@@ -11,7 +11,7 @@ __version__ = "1.0.2"
 
 ext_modules = [Pybind11Extension(
         "oxenmq",
-        ["src/bencode.cpp", "src/module.cpp", "src/oxenmq.cpp"],
+        ["src/oxenmq.cpp"],
         cxx_std=17,
         libraries=["oxenmq"],
         ),
