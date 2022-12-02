@@ -1,3 +1,10 @@
+pyoxenmq (1.0.3-1~deb12) bookworm; urgency=medium
+
+  * Rename is_reply -> is_request
+  * Remove base32z encoding
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Fri, 02 Dec 2022 17:44:10 -0400
+
 pyoxenmq (1.0.2-2~deb12) bookworm; urgency=medium
 
   * fix compilation with newer gcc
