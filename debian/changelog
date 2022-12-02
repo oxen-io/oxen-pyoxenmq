@@ -1,3 +1,10 @@
+pyoxenmq (1.0.3-1) sid; urgency=medium
+
+  * Rename is_reply -> is_request
+  * Remove base32z encoding
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Fri, 02 Dec 2022 17:44:06 -0400
+
 pyoxenmq (1.0.2-2) sid; urgency=medium
 
   * compilation fix for newer gcc
