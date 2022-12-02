@@ -1,3 +1,11 @@
+pyoxenmq (1.0.3-1~ubuntu2204) jammy; urgency=medium
+
+  * macos compilation fix
+  * Rename is_reply -> is_request
+  * Remove base32z encoding
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Fri, 02 Dec 2022 17:44:22 -0400
+
 pyoxenmq (1.0.2-1~ubuntu2204) jammy; urgency=medium
 
   * jammy deb
