@@ -1,3 +1,9 @@
+pyoxenmq (1.0.3-1~deb12+1) bookworm; urgency=medium
+
+  * Rebuild on bookworm for Python 3.11 transition
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Tue, 24 Jan 2023 20:57:41 -0400
+
 pyoxenmq (1.0.3-1~deb12) bookworm; urgency=medium
 
   * Rename is_reply -> is_request
