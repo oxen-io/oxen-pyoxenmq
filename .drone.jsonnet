@@ -31,7 +31,7 @@ local debian_pipeline(name,
       image: image,
       pull: 'always',
       [if allow_fail then 'failure']: 'ignore',
-      environment: { SSH_KEY: { from_secret: 'SSH_KEY' } },
+      environment: { SSH_KEY: { from_secret: 'SSH_KEY' }, PIP_BREAK_SYSTEM_PACKAGES: '1' },
       commands: [
                   'echo "Building on ${DRONE_STAGE_MACHINE}"',
                   'echo "man-db man-db/auto-update boolean false" | debconf-set-selections',
