@@ -1,3 +1,10 @@
+pyoxenmq (1.0.4-1~deb10) buster; urgency=medium
+
+  * Expose setting auth level on outgoing connection
+  * fix debian sid builds
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Tue, 28 Mar 2023 09:36:40 +1100
+
 pyoxenmq (1.0.3-1~deb10) buster; urgency=medium
 
   * macos compilation fix
