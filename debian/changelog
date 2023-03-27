@@ -1,3 +1,10 @@
+pyoxenmq (1.0.4-1~deb12) bookworm; urgency=medium
+
+  * Expose setting auth level on outgoing connection
+  * fix debian sid builds
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Tue, 28 Mar 2023 09:36:37 +1100
+
 pyoxenmq (1.0.3-1~deb12+1) bookworm; urgency=medium
 
   * Rebuild on bookworm for Python 3.11 transition
