@@ -1,3 +1,10 @@
+pyoxenmq (1.0.4-1) sid; urgency=medium
+
+  * Expose setting auth level on outgoing connection
+  * fix debian sid builds
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Tue, 28 Mar 2023 09:36:31 +1100
+
 pyoxenmq (1.0.3-1) sid; urgency=medium
 
   * Rename is_reply -> is_request
