@@ -1,3 +1,9 @@
+pyoxenmq (1.0.3-1~ubuntu2304) lunar; urgency=medium
+
+  * rebuild for lunar
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Fri, 21 Apr 2023 18:28:17 -0300
+
 pyoxenmq (1.0.3-1~ubuntu2210) kinetic; urgency=medium
 
   * Rename is_reply -> is_request
