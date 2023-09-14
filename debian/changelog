@@ -1,3 +1,9 @@
+pyoxenmq (1.0.4-2~deb12) bookworm; urgency=medium
+
+  * Bump oxenmq dependency to pick up epoll support
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Thu, 14 Sep 2023 16:39:39 -0300
+
 pyoxenmq (1.0.4-1~deb12) bookworm; urgency=medium
 
   * Expose setting auth level on outgoing connection
