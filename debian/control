@@ -3,7 +3,7 @@ Priority: optional
 Maintainer: Jason Rhinelander <jason@oxen.io>
 Build-Depends:
     debhelper-compat (= 11),
-    liboxenmq-dev (>= 1.2.8~),
+    liboxenmq-dev (>= 1.2.16~),
     pybind11-dev,
     python3-pybind11,
     python3-setuptools,
