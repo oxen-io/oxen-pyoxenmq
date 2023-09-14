@@ -1,3 +1,9 @@
+pyoxenmq (1.0.4-2) sid; urgency=medium
+
+  * Bump oxenmq dependency to pick up epoll support
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Thu, 14 Sep 2023 16:38:50 -0300
+
 pyoxenmq (1.0.4-1) sid; urgency=medium
 
   * Expose setting auth level on outgoing connection
