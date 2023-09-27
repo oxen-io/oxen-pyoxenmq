@@ -16,6 +16,7 @@ local apt_get_quiet = 'apt-get -o=Dpkg::Use-Pty=0 -q';
 local debian_pipeline(name,
                       image,
                       arch='amd64',
+                      distro='$$(lsb_release -sc)',
                       deps=default_deps,
                       extra_cmds=[],
                       jobs=6,
@@ -41,9 +42,9 @@ local debian_pipeline(name,
                   if loki_repo then [
                     'eatmydata ' + apt_get_quiet + ' install --no-install-recommends -y lsb-release',
                     'cp contrib/deb.oxen.io.gpg /etc/apt/trusted.gpg.d',
-                    'echo deb http://deb.oxen.io $$(lsb_release -sc) main >/etc/apt/sources.list.d/oxen.list',
-                    'echo deb http://deb.oxen.io/beta $$(lsb_release -sc) main >>/etc/apt/sources.list.d/oxen.list',
-                    'echo deb http://deb.oxen.io/staging $$(lsb_release -sc) main >>/etc/apt/sources.list.d/oxen.list',
+                    'echo deb http://deb.oxen.io ' + distro + ' main >/etc/apt/sources.list.d/oxen.list',
+                    'echo deb http://deb.oxen.io/beta ' + distro + ' main >>/etc/apt/sources.list.d/oxen.list',
+                    'echo deb http://deb.oxen.io/staging ' + distro + ' main >>/etc/apt/sources.list.d/oxen.list',
                     'eatmydata ' + apt_get_quiet + ' update',
                   ] else []
                 ) + [
@@ -92,14 +93,14 @@ local mac_builder(name,
 
 [
   // Various debian builds
-  debian_pipeline('Debian sid (amd64)', docker_base + 'debian-sid'),
+  debian_pipeline('Debian sid (amd64)', docker_base + 'debian-sid', distro='sid'),
   debian_pipeline('Debian stable (i386)', docker_base + 'debian-stable/i386'),
   debian_pipeline('Debian buster (amd64)', docker_base + 'debian-buster'),
   debian_pipeline('Ubuntu latest (amd64)', docker_base + 'ubuntu-rolling'),
   debian_pipeline('Ubuntu LTS (amd64)', docker_base + 'ubuntu-lts'),
 
   // ARM builds (ARM64 and armhf)
-  debian_pipeline('Debian sid (ARM64)', docker_base + 'debian-sid', arch='arm64', jobs=4),
+  debian_pipeline('Debian sid (ARM64)', docker_base + 'debian-sid', arch='arm64', jobs=4, distro='sid'),
   debian_pipeline('Debian stable (armhf)', docker_base + 'debian-stable/arm32v7', arch='arm64', jobs=4),
 
   // Macos builds:
