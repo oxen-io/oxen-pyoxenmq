@@ -1,3 +1,9 @@
+pyoxenmq (1.0.4-3~deb12) bookworm; urgency=medium
+
+  * Rebuild with newer oxenmq
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Wed, 27 Sep 2023 20:08:55 -0300
+
 pyoxenmq (1.0.4-2~deb12) bookworm; urgency=medium
 
   * Bump oxenmq dependency to pick up epoll support
