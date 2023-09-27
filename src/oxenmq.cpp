@@ -757,12 +757,12 @@ the background).)")
             }
 
             bool request = kwargs.contains("request") && kwargs["request"].cast<bool>();
-            std::optional<py::function> on_reply, on_reply_failure;
+            std::unique_ptr<py::function> on_reply, on_reply_failure;
             if (request) {
                 if (kwargs.contains("on_reply"))
-                    on_reply = kwargs["on_reply"].cast<py::function>();
+                    on_reply = std::make_unique<py::function>(kwargs["on_reply"].cast<py::function>());
                 if (kwargs.contains("on_reply_failure"))
-                    on_reply_failure = kwargs["on_reply_failure"].cast<py::function>();
+                    on_reply_failure = std::make_unique<py::function>(kwargs["on_reply_failure"].cast<py::function>());
             } else if (kwargs.contains("on_reply") || kwargs.contains("on_reply_failure")) {
                 throw std::logic_error{"Error: send(...) on_reply=/on_reply_failure= option "
                     "requires request=True (perhaps you meant to use `.request(...)` instead?)"};
@@ -795,29 +795,32 @@ the background).)")
                         hint, optional, incoming, outgoing, keep_alive, request_timeout,
                         std::move(qfail), std::move(qfull));
             } else {
-                auto reply_cb = [on_reply = std::move(on_reply), on_fail = std::move(on_reply_failure)]
-                    (bool success, std::vector<std::string> data) mutable {
+                auto reply_cb = [reply_rawptr = on_reply.release(), fail_rawptr = on_reply_failure.release()]
+                    (bool success, std::vector<std::string> data) {
                         // The gil here makes things tricky: the function invocation itself is
                         // already gil protected, but the *destruction* of the lambda isn't, and
                         // that breaks things because the destruction frees a python reference to
                         // the callback.  However oxenmq invokes this callback exactly once so we
-                        // can deal with it by stealing the captures out of the lambda to force
-                        // destruction here, with the gil held.
+                        // can deal with it by leaking raw pointers into the lambda captures then
+                        // reclaiming them the one and only time we are called.
                         py::gil_scoped_acquire gil;
-                        auto reply = std::move(on_reply);
-                        auto fail = std::move(on_fail);
+                        std::unique_ptr<py::function> reply{reply_rawptr};
+                        std::unique_ptr<py::function> fail{fail_rawptr};
 
-                        if (success ? !reply : !fail)
-                            return;
-                        py::list l;
                         if (success) {
-                            for (const auto& part : data)
-                                l.append(py::memoryview::from_memory(part.data(), part.size()));
-                            (*reply)(l);
-                        } else if (on_fail) {
-                            for (const auto& part : data)
-                                l.append(py::bytes(part.data(), part.size()));
-                            (*fail)(l);
+                            if (reply) {
+                                py::list l;
+                                for (const auto& part : data)
+                                    l.append(py::memoryview::from_memory(part.data(), part.size()));
+                                (*reply)(l);
+                            }
+                        } else {
+                            if (fail) {
+                                py::list l;
+                                for (const auto& part : data)
+                                    l.append(py::bytes(part.data(), part.size()));
+                                (*fail)(l);
+                            }
                         }
                     };
 
