@@ -1,3 +1,9 @@
+pyoxenmq (1.0.5-2~deb13) trixie; urgency=medium
+
+  * Rebuild
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Tue, 20 Feb 2024 21:16:07 -0400
+
 pyoxenmq (1.0.5-1~deb13) trixie; urgency=medium
 
   * Fix python binding segfault
