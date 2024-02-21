@@ -1,6 +1,6 @@
-pyoxenmq (1.0.5-2~ubuntu2310) mantic; urgency=medium
+pyoxenmq (1.0.5-2~ubuntu2404) noble; urgency=medium
 
-  * Rebuild
+  * Rebuild for noble
 
  -- Jason Rhinelander <jason@imaginary.ca>  Tue, 20 Feb 2024 21:16:36 -0400
 
