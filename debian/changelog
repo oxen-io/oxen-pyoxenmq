@@ -1,3 +1,9 @@
+pyoxenmq (1.0.5-2~deb11) bullseye; urgency=medium
+
+  * Rebuild
+
+ -- Jason Rhinelander <jason@imaginary.ca>  Tue, 20 Feb 2024 21:15:56 -0400
+
 pyoxenmq (1.0.5-1~deb11) bullseye; urgency=medium
 
   * Expose setting auth level on outgoing connection
