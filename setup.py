@@ -12,7 +12,7 @@ __version__ = "1.0.5"
 ext_modules = [Pybind11Extension(
         "oxenmq",
         ["src/oxenmq.cpp"],
-        cxx_std=17,
+        cxx_std=20,
         libraries=["oxenmq"],
         ),
 ]
