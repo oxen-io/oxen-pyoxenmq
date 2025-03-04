@@ -1,3 +1,17 @@
+pyoxenmq (1.0.6-1~deb12) bookworm; urgency=medium
+
+  [ Jason Rhinelander ]
+  * Fix typo in request_future usage exception
+
+  [ Ryan Miller ]
+  * fix: change setup cpp version to 20
+
+  [ Jason Rhinelander ]
+  * bump version for c++20 build change
+  * ci fixes
+
+ -- Jason Rhinelander <jason@session.foundation>  Mon, 03 Mar 2025 21:20:05 -0400
+
 pyoxenmq (1.0.5-2~deb12) bookworm; urgency=medium
 
   * Rebuild
