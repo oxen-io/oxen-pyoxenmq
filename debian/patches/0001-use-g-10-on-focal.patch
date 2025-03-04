@@ -1,0 +1,23 @@
+From: Jason Rhinelander <jason@imaginary.ca>
+Date: Mon, 3 Mar 2025 21:34:28 -0400
+Subject: use g++-10 on focal
+
+---
+ setup.py | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/setup.py b/setup.py
+index ed06048..61590c8 100644
+--- a/setup.py
++++ b/setup.py
+@@ -1,5 +1,10 @@
+ from setuptools import setup
+ 
++# Ubuntu 20.04 needs to use g++-10 for C++20 support:
++import os
++os.environ["CC"] = "gcc-10"
++os.environ["CXX"] = "g++-10"
++
+ # Available at setup time due to pyproject.toml
+ from pybind11.setup_helpers import Pybind11Extension, build_ext
+ 
