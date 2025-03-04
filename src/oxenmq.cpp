@@ -958,7 +958,7 @@ OxenMQ requests so that both are treated fairly in terms of processing priority.
 
     oxenmq.def("request_future", [](py::handle self, py::args args, py::kwargs kwargs) {
         if (kwargs.contains("on_reply") || kwargs.contains("on_reply_failure"))
-            throw std::logic_error{"Cannot call request_wait(...) with on_reply= or on_reply_failure="};
+            throw std::logic_error{"Cannot call request_future(...) with on_reply= or on_reply_failure="};
 
         auto result = std::make_shared<std::promise<py::list>>();
         auto fut = result->get_future();
