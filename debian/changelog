@@ -1,3 +1,9 @@
+pyoxenmq (1.0.5-2+b1) sid; urgency=medium
+
+  * Rebuild on sid for updated python
+
+ -- Jason Rhinelander <jason@session.foundation>  Mon, 03 Mar 2025 21:05:20 -0400
+
 pyoxenmq (1.0.5-2) sid; urgency=medium
 
   * Rebuild
