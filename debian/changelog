@@ -1,4 +1,4 @@
-pyoxenmq (1.0.6-1~ubuntu2404) noble; urgency=medium
+pyoxenmq (1.0.6-1~ubuntu2410) oracular; urgency=medium
 
   [ Jason Rhinelander ]
   * Fix typo in request_future usage exception
