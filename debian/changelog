@@ -1,3 +1,9 @@
+pyoxenmq (1.0.6-1~deb12+1) bookworm; urgency=medium
+
+  * rebuild
+
+ -- Jason Rhinelander <jason@session.foundation>  Tue, 13 May 2025 18:04:48 -0300
+
 pyoxenmq (1.0.6-1~deb12) bookworm; urgency=medium
 
   [ Jason Rhinelander ]
