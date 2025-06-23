@@ -1,5 +1,6 @@
-pyoxenmq (1.0.6-2~ubuntu2410) oracular; urgency=medium
+pyoxenmq (1.0.6-2~ubuntu2504) plucky; urgency=medium
 
+  * add plucky build
   * rebuild for newer oxenmq
   * drop armhf from oracular
 
