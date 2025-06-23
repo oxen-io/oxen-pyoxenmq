@@ -1,3 +1,10 @@
+pyoxenmq (1.0.6-2~ubuntu2410) oracular; urgency=medium
+
+  * rebuild for newer oxenmq
+  * drop armhf from oracular
+
+ -- Jason Rhinelander <jason@session.foundation>  Mon, 23 Jun 2025 13:12:52 -0300
+
 pyoxenmq (1.0.6-1~ubuntu2410) oracular; urgency=medium
 
   [ Jason Rhinelander ]
