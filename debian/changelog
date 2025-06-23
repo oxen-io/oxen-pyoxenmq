@@ -1,3 +1,10 @@
+pyoxenmq (1.0.6-2~ubuntu2204) jammy; urgency=medium
+
+  * rebuild for newer oxenmq
+  * fix old docker name
+
+ -- Jason Rhinelander <jason@session.foundation>  Mon, 23 Jun 2025 13:12:44 -0300
+
 pyoxenmq (1.0.6-1~ubuntu2204) jammy; urgency=medium
 
   [ Jason Rhinelander ]
