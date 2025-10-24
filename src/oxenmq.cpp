@@ -2,6 +2,8 @@
 #include <exception>
 #include <oxenmq/oxenmq.h>
 #include <oxenmq/address.h>
+#include <oxen/log/level.hpp>
+#include <oxen/log.hpp>
 #include <pybind11/attr.h>
 #include <pybind11/chrono.h>
 #include <pybind11/functional.h>
@@ -40,17 +42,6 @@ std::vector<std::string> extract_data_parts(py::handle obj) {
     extract_data_parts(parts, obj);
     return parts;
 }
-
-// Quick and dirty logger that logs to stderr.  It would be much nicer to take a python function,
-// but that deadlocks pretty much right away because of the crappiness of the gil.
-struct stderr_logger {
-    inline static std::mutex log_mutex;
-
-    void operator()(LogLevel lvl, const char* file, int line, std::string msg) {
-        std::lock_guard l{log_mutex};
-        std::cerr << '[' << lvl << "][" << file << ':' << line << "]: " << msg << "\n";
-    }
-};
 
 PYBIND11_MODULE(oxenmq, mod)
 {
@@ -278,8 +269,7 @@ this object must *not* be stored beyond the callback itself; see `Message` for d
                             try {
                                 result = extract_data_parts(obj);
                             } catch (const std::exception& e) {
-                                msg.oxenmq.log(LogLevel::warn, __FILE__, __LINE__,
-                                        "Python callback returned "s + e.what());
+                                oxen::log::warning(oxen::log::Cat("oxenmq"), "Python callback returned {}", e.what());
                                 return;
                             }
                         }
@@ -305,9 +295,9 @@ The callback also must take care not to save the provided `Message` value beyond
 callback itself.)")
                 ;
 
-    py::enum_<LogLevel>(mod, "LogLevel")
-        .value("fatal", LogLevel::fatal).value("error", LogLevel::error).value("warn", LogLevel::warn)
-        .value("info", LogLevel::info).value("debug", LogLevel::debug).value("trace", LogLevel::trace);
+    py::enum_<oxen::log::Level>(mod, "LogLevel")
+        .value("critical", oxen::log::Level::critical).value("error", oxen::log::Level::err).value("warn", oxen::log::Level::warn)
+        .value("info", oxen::log::Level::info).value("debug", oxen::log::Level::debug).value("trace", oxen::log::Level::trace);
 
     py::class_<OxenMQ> oxenmq{mod, "OxenMQ"};
     oxenmq
@@ -316,10 +306,14 @@ callback itself.)")
                         py::bytes privkey,
                         bool sn,
                         OxenMQ::SNRemoteAddress sn_lookup,
-                        std::optional<LogLevel> log_level) {
-            return std::make_unique<OxenMQ>(pubkey, privkey, sn, std::move(sn_lookup),
-                    log_level ? OxenMQ::Logger{stderr_logger{}} : nullptr,
-                    log_level.value_or(LogLevel::warn));
+                        std::optional<oxen::log::Level> log_level) {
+            if (log_level) {
+                oxen::log::clear_sinks();
+                oxen::log::add_sink(oxen::log::Type::Print, "stderr");
+                oxen::log::set_level(oxen::log::Cat("oxenmq"), *log_level);
+            }
+
+            return std::make_unique<OxenMQ>(pubkey, privkey, sn, std::move(sn_lookup));
         }),
                 kwonly,
                 "pubkey"_a = py::bytes(), "privkey"_a = py::bytes(), "service_node"_a = false,
@@ -350,9 +344,7 @@ Parameters:
   couldn't verify its authenticity).  Should return empty for not found or if SN lookups are not
   supported.  If omitted a stub function is used that always returns empty.
 
-- log_level the initial log level; defaults to warn.  The log level can be changed later by calling
-  log_level(...).  Note that currently all logging goes directly to stderr because of obstacles with
-  Python's GIL.  In the future a Python callback may be supported for log messages.
+- log_level enables logging to stderr, if passed.
 )")
 
         .def_readwrite("handshake_time", &OxenMQ::HANDSHAKE_TIME,
