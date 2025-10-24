@@ -1,3 +1,9 @@
+pyoxenmq (1.1.0-1~deb14) forky; urgency=medium
+
+  * Upgrade for compatibility with oxenmq 1.3
+
+ -- Jason Rhinelander <jason@session.foundation>  Thu, 23 Oct 2025 23:49:49 -0300
+
 pyoxenmq (1.0.6-2~deb14) forky; urgency=medium
 
   * forky deb
