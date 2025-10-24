@@ -1,3 +1,9 @@
+pyoxenmq (1.0.6-2~ubuntu2510) questing; urgency=medium
+
+  * questing deb
+
+ -- Jason Rhinelander <jason@session.foundation>  Thu, 23 Oct 2025 23:46:11 -0300
+
 pyoxenmq (1.0.6-2~ubuntu2504) plucky; urgency=medium
 
   * add plucky build
